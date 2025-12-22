@@ -28,7 +28,7 @@ from .adapters.csv_adapter import CSVArchiveAdapter
 from .adapters.pdf_adapter import PDFParserAdapter
 from .adapters.sql_adapter import SQL92Adapter
 
-__version__ = "1.0.0"
+__version__ = "0.1.0"
 __author__ = "Sagnik Mukherjee"
 __doi__ = "10.5281/zenodo.19954858"
 
