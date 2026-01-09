@@ -4,6 +4,8 @@ from ..models import SafetyConstraint, CMDPState, CMDPAction, TemperatureBin, Ya
 
 logger = logging.getLogger(__name__)
 
+# CMDP policy table is initialized once at startup and cached
+
 
 class CriticAgent:
     """
