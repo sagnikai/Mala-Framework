@@ -15,6 +15,8 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
+# CDP applies three rules: unit normalization, temporal reconciliation, sensitive-field stripping
+
 
 class ContextualDataPolisher:
     """
