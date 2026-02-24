@@ -4,6 +4,8 @@ from ..models import KnowledgeSet, CMDPAction
 
 logger = logging.getLogger(__name__)
 
+# Critic-guided planning: Planner queries Critic before proposing action
+
 
 class PlannerAgent:
     """
