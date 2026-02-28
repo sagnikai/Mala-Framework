@@ -10,6 +10,7 @@ from ..cdp import ContextualDataPolisher
 logger = logging.getLogger(__name__)
 
 # Freshness threshold: F(Dt) < 0.47 triggers re-fetch (approx 15 min)
+# GISM translates local jargon; CDP polishes units, timestamps, and PII
 
 
 class GathererAgent:
