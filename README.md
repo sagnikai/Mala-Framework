@@ -4,6 +4,10 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19954858.svg)](https://doi.org/10.5281/zenodo.19954858)
 
+## Overview
+
+MALA integrates multi-agent AI into legacy industrial environments without requiring API modernization.
+
 ## Abstract
 
 The **Multi-Agent Legacy Architecture (MALA)** framework addresses the critical challenge of integrating agentic artificial intelligence into legacy industrial environments that lack modern Application Programming Interfaces (APIs). By treating legacy software systems—including terminal interfaces, comma-separated value (CSV) archives, and scanned Portable Document Format (PDF) files—as a dynamic operational surface rather than a static data repository, MALA enables autonomous decision support while maintaining rigorous, deterministic safety guarantees through a Constrained Markov Decision Process (CMDP) formulation.
