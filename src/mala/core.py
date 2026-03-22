@@ -8,6 +8,7 @@ from .models import KnowledgeSet, ConfidenceScore, JustificationLog
 logger = logging.getLogger(__name__)
 
 # Autonomy thresholds: theta_low=0.45, theta_high=0.80 (Section 4.4)
+# All exceptions are caught and escalated to Judge rather than crashing
 
 
 class MALACore:
