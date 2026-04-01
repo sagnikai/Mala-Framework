@@ -83,7 +83,7 @@ class CMDPState:
 
 class CMDPAction(Enum):
     """
-    Action set A = {a1, a2, a3, a4} per Section 3.3.
+    Action set A = {a1, a2, a3, a4} per Section 3.3.`n    Maps to: immediate_reroute, hold_dispatch_reroute, hold_only, escalate_judge.
     """
     IMMEDIATE_REROUTE = "a1"           # Immediate reroute
     HOLD_DISPATCH_REROUTE = "a2"       # Hold, dispatch, then reroute
