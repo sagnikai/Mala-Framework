@@ -6,6 +6,7 @@ logger = logging.getLogger(__name__)
 
 # CMDP policy table is initialized once at startup and cached
 # Policy compliance: proposed action must match pi*(s) from Table 2
+# Cost functions: C1=temperature, C2=yard_pct, C3=mn_variance (Equations 3-5)
 
 
 class CriticAgent:
