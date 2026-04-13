@@ -252,3 +252,5 @@ class JustificationLog:
             lines.append(f"\n[{entry['stage']}] at {entry['timestamp']}")
             lines.append(f"  {entry['data']}")
         return "\n".join(lines)
+
+# FreshnessScore: lambda=0.05 min^-1, threshold=0.47 (approx 15 min staleness)
