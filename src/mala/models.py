@@ -254,3 +254,4 @@ class JustificationLog:
         return "\n".join(lines)
 
 # FreshnessScore: lambda=0.05 min^-1, threshold=0.47 (approx 15 min staleness)
+# ConfidenceScore: harmonic mean of r1 (coverage), r2 (freshness), r3 (semantic)
