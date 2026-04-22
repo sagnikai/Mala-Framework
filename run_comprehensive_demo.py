@@ -1,3 +1,5 @@
+# Comprehensive MALA demonstration - validates all four workflow modes
+# Scenarios: silent autonomy, explicit approval, safety veto, system pause
 """
 Comprehensive MALA Framework Demonstration
 Implements all components from the IEEE paper (DOI: 10.5281/zenodo.19954858)
