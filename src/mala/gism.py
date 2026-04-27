@@ -12,6 +12,8 @@ from typing import Optional, Dict
 
 logger = logging.getLogger(__name__)
 
+# GISM is a static lookup; add_mapping() persists to in-memory dict only in prototype
+
 
 class GISM:
     """

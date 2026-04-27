@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 # CDP applies three rules: unit normalization, temporal reconciliation, sensitive-field stripping
 # State space: 27 discrete states s=(T,Y,M) per Section 3.3
+# CDP is stateless: each call to polish() is independent
 
 
 class ContextualDataPolisher:
