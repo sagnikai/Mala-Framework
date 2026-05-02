@@ -328,3 +328,5 @@ For questions, issues, or collaboration inquiries, please open an issue on the G
 **Repository**: [github.com/sagnikai/Mala-Framework](https://github.com/sagnikai/Mala-Framework)  
 **Version**: 1.0.0  
 **Last Updated**: May 2026
+
+<!-- Last updated: May 2026 -->
