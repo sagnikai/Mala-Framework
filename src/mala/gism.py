@@ -78,7 +78,7 @@ class GISM:
         self.coverage_stats = {
             "total_entries": 420,
             "implemented_subset": len(self.mappings),
-            "coverage_rate": 0.85  # 85% coverage per Section 5.8
+            "coverage_rate": 0.85  # 85% coverage per Section 5 (GISM Coverage subsection)
         }
     
     def translate(self, local_term: str) -> Optional[str]:

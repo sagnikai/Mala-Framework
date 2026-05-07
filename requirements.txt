@@ -1,1 +1,24 @@
-# MALA Framework Dependencies
+# MALA Framework — Python Dependencies
+# DOI: 10.5281/zenodo.19954858
+#
+# Core runtime (no external packages required for the prototype —
+# all adapters use Python stdlib only).
+#
+# Optional: install these to enable live LLM calls and real OCR/PDF
+# extraction in production deployments.
+#
+# LLM API (used in paper evaluation: gpt-4-turbo, text-embedding-3-small)
+# openai>=1.30.0
+#
+# OCR (production TerminalOCRAdapter)
+# pytesseract>=0.3.10
+# Pillow>=10.0.0
+#
+# PDF extraction (production PDFParserAdapter)
+# pdfplumber>=0.10.0
+#
+# SQL connectivity (production SQL92Adapter)
+# pyodbc>=5.0.0
+#
+# Development / testing
+# pytest>=8.0.0

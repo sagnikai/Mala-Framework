@@ -62,14 +62,14 @@ class GathererAgent:
         autonomy_level = self.confidence_scorer.get_autonomy_level(rho)
         
         logger.info(
-            f"RCE depth {depth}: ρ={rho:.3f}, "
+            f"RCE depth {depth}: rho={rho:.3f}, "
             f"coverage={knowledge_set.get_coverage_ratio():.2f}, "
             f"autonomy={autonomy_level}"
         )
         
         # Check if we have sufficient confidence
         if rho >= self.confidence_scorer.theta_high:
-            logger.info(f"RCE complete: ρ={rho:.3f} >= θ_high={self.confidence_scorer.theta_high}")
+            logger.info(f"RCE complete: rho={rho:.3f} >= theta_high={self.confidence_scorer.theta_high}")
             return knowledge_set
         
         # Identify gaps and fill them
@@ -163,47 +163,45 @@ class GathererAgent:
     
     def _parse_terminal_output(self, raw_text: str) -> Dict:
         """
-        Parse OCR terminal output with GISM translation.
-        Extracts temperature, heat ID, status, etc.
+        Parse OCR terminal output and apply GISM translation to raw tokens.
+
+        GISM is applied only to the *raw terminal tokens* (e.g. ``TMP``,
+        ``RM_B``, ``D0WN``) before they are mapped to canonical field
+        names.  Internal normalized keys such as ``"temperature_unit"``
+        or ISO timestamp strings are **not** passed through GISM — they
+        are already in standard form and would only generate spurious
+        "no mapping found" warnings.
         """
         parsed = {}
-        
-        # Temperature extraction
+
+        # Temperature extraction — raw token "TMP" -> "temperature"
         temp_match = re.search(r"TMP\s+(\d+)", raw_text)
         if temp_match:
             parsed["temperature"] = float(temp_match.group(1))
             parsed["temperature_unit"] = "C"
-        
+
         # Heat ID extraction
         heat_match = re.search(r"HEAT\s+(H-\d+)", raw_text)
         if heat_match:
             parsed["heat_id"] = heat_match.group(1)
-        
-        # Batch/Lot extraction
+
+        # Batch/Lot extraction — keep as string to preserve alphanumeric IDs
         lot_match = re.search(r"LOT\s+(\w+)", raw_text)
         if lot_match:
             parsed["batch_id"] = lot_match.group(1)
-        
-        # Mill status
+
+        # Mill status — translate raw tokens "RM_B" and "D0WN" via GISM
         mill_match = re.search(r"(RM_B|RM-B|Mill B)\s+(D0WN|DOWN)", raw_text, re.IGNORECASE)
         if mill_match:
-            parsed["mill_status"] = "DOWN"
-            parsed["affected_mill"] = "Rolling_Mill_B"
-        
-        # Timestamp
+            raw_mill = mill_match.group(1)
+            raw_status = mill_match.group(2)
+            parsed["mill_status"] = self.gism.translate(raw_status) or "system_down"
+            parsed["affected_mill"] = self.gism.translate(raw_mill) or raw_mill
+
+        # Timestamp — keep as-is; it is already a standard string
         time_match = re.search(r"\[([^\]]+)\]", raw_text)
         if time_match:
             parsed["timestamp"] = time_match.group(1)
-        
-        # Apply GISM translation to all extracted fields
-        translated = {}
-        for key, value in parsed.items():
-            if isinstance(value, str):
-                translated_key = self.gism.translate(key) or key
-                translated_value = self.gism.translate(value) or value
-                translated[translated_key] = translated_value
-            else:
-                translated[key] = value
-        
-        logger.debug(f"Parsed terminal output: {translated}")
-        return translated
+
+        logger.debug(f"Parsed terminal output: {parsed}")
+        return parsed

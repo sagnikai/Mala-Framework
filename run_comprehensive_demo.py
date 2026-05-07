@@ -1,5 +1,12 @@
 # Comprehensive MALA demonstration - validates all four workflow modes
 # Scenarios: silent autonomy, explicit approval, safety veto, system pause
+import sys
+import io
+# Ensure UTF-8 output on Windows consoles
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+else:
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 """
 Comprehensive MALA Framework Demonstration
 Implements all components from the IEEE paper (DOI: 10.5281/zenodo.19954858)

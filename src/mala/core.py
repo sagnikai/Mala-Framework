@@ -61,7 +61,7 @@ class MALACore:
         rho = self._compute_confidence(knowledge_set)
         autonomy_level = self.confidence_scorer.get_autonomy_level(rho)
         
-        logger.info(f"Confidence ρ={rho:.3f}, autonomy_level={autonomy_level}")
+        logger.info(f"Confidence rho={rho:.3f}, autonomy_level={autonomy_level}")
         
         self.justification_log.add_entry("CONFIDENCE_SCORE", {
             "rho": rho,
@@ -72,7 +72,7 @@ class MALACore:
         
         # Check if we need to pause for missing evidence
         if rho < self.confidence_scorer.theta_low:
-            logger.warning(f"ρ={rho:.3f} < θ_low={self.confidence_scorer.theta_low}: SYSTEM PAUSE")
+            logger.warning(f"rho={rho:.3f} < theta_low={self.confidence_scorer.theta_low}: SYSTEM PAUSE")
             return self._system_pause(knowledge_set, rho)
         
         # Stage 2: LLM-based plan generation
@@ -102,11 +102,11 @@ class MALACore:
         
         # Check if explicit approval needed (θ_low <= ρ < θ_high)
         if autonomy_level == "approval":
-            logger.info(f"Explicit approval required: {self.confidence_scorer.theta_low} <= ρ={rho:.3f} < {self.confidence_scorer.theta_high}")
+            logger.info(f"Explicit approval required: {self.confidence_scorer.theta_low} <= rho={rho:.3f} < {self.confidence_scorer.theta_high}")
             return self.escalate_to_judge(knowledge_set, proposal, "Explicit approval required", rho)
         
         # Silent autonomy: execute
-        logger.info(f"Silent autonomy: ρ={rho:.3f} >= θ_high={self.confidence_scorer.theta_high}")
+        logger.info(f"Silent autonomy: rho={rho:.3f} >= theta_high={self.confidence_scorer.theta_high}")
         return self._execute_plan(proposal, knowledge_set, rho)
     
     def _compute_confidence(self, knowledge_set: KnowledgeSet) -> float:
@@ -142,25 +142,48 @@ class MALACore:
     def _system_pause(self, knowledge_set: KnowledgeSet, rho: float) -> Dict:
         """
         System pause for insufficient confidence.
-        Per Section 4.4: ρ < θ_low triggers pause with missing evidence exposed.
+
+        Per Section 4.4: ρ < θ_low triggers pause with missing evidence
+        exposed.  Two distinct sub-cases are distinguished:
+        - Missing fields: source-coverage ratio r1 < 1.0
+        - Low freshness or semantic score despite full coverage
         """
         missing_fields = knowledge_set.required_fields - set(knowledge_set.data.keys())
-        
+
+        if missing_fields:
+            pause_reason = (
+                f"Insufficient confidence: ρ={rho:.3f} < "
+                f"θ_low={self.confidence_scorer.theta_low} "
+                f"(missing fields: {sorted(missing_fields)})"
+            )
+        else:
+            pause_reason = (
+                f"Insufficient confidence: ρ={rho:.3f} < "
+                f"θ_low={self.confidence_scorer.theta_low} "
+                f"(all required fields present but freshness or "
+                f"semantic score below threshold)"
+            )
+
         self.justification_log.add_entry("SYSTEM_PAUSE", {
-            "reason": "Insufficient confidence",
+            "reason": pause_reason,
             "rho": rho,
-            "missing_fields": list(missing_fields)
+            "missing_fields": sorted(missing_fields),
+            "coverage_ratio": knowledge_set.get_coverage_ratio(),
+            "freshness_score": knowledge_set.get_freshness_score(),
+            "semantic_score": knowledge_set.get_semantic_score(),
         })
-        
-        logger.warning(f"=== MALA Workflow Paused ===")
-        
+
+        logger.warning("=== MALA Workflow Paused ===")
+
         return {
             "status": "SYSTEM_PAUSE",
-            "reason": f"Insufficient confidence: ρ={rho:.3f} < θ_low={self.confidence_scorer.theta_low}",
-            "missing_fields": list(missing_fields),
+            "reason": pause_reason,
+            "missing_fields": sorted(missing_fields),
             "confidence": rho,
+            "coverage_ratio": knowledge_set.get_coverage_ratio(),
+            "freshness_score": knowledge_set.get_freshness_score(),
             "justification_log": self.justification_log.get_full_log(),
-            "knowledge_set": knowledge_set.data
+            "knowledge_set": knowledge_set.data,
         }
     
     def escalate_to_judge(self, knowledge_set: KnowledgeSet, proposal: Dict, 

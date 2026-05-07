@@ -82,17 +82,32 @@ class ContextualDataPolisher:
         field_lower = field_name.lower()
         return any(sensitive in field_lower for sensitive in self.sensitive_fields)
     
+    # Fields that look like measurements but are identifiers — never normalize.
+    _IDENTIFIER_FIELDS = {
+        "heat_id", "batch_id", "batch_lot", "order_id", "truck_id",
+        "equipment_id", "heat_identifier", "batch_identifier",
+    }
+
     def _is_measurement_field(self, key: str, value: Any) -> bool:
         """
-        Detect if field is a measurement with units.
-        Looks for patterns like "1548C", "79.0%", "1550 F"
+        Detect if a field is a physical measurement with units.
+
+        Accepts patterns like ``"1548C"``, ``"79.0%"``, ``"1550 F"``.
+        Explicitly rejects identifier fields (heat_id, batch_id, etc.)
+        whose alphanumeric values (e.g. ``"7A"``) would otherwise
+        match the numeric-plus-letter pattern.
         """
+        if key.lower() in self._IDENTIFIER_FIELDS:
+            return False
+
         if not isinstance(value, (str, int, float)):
             return False
-        
+
         value_str = str(value)
-        # Pattern: number followed by unit letter(s)
-        return bool(re.search(r'\d+\.?\d*\s*[A-Za-z%]+', value_str))
+        # Must start with a number; unit suffix must be a recognised
+        # physical unit abbreviation, not an arbitrary letter.
+        _KNOWN_UNITS = r"(?:C|F|K|bar|psi|Pa|ft|in|m|%)"
+        return bool(re.match(rf'[\d.]+\s*{_KNOWN_UNITS}$', value_str.strip()))
     
     def _normalize_units(self, key: str, value: Any) -> tuple[float, str]:
         """
