@@ -6,17 +6,17 @@
 
 ## Overview
 
-MALA integrates multi-agent AI into legacy industrial environments without requiring API modernization. It achieves this by treating legacy software interfaces—terminal screens, CSV archives, and scanned PDF documents—as a queryable operational surface, supporting autonomous decision-making under rigorous, formally verified safety constraints.
+MALA connects multi-agent AI to legacy industrial systems without requiring API modernization. It treats legacy software interfaces---terminal screens, CSV archives, and scanned PDF documents---as a queryable operational surface, supporting autonomous decision-making under formally verified safety constraints.
 
 ## Abstract
 
-The **Multi-Agent Legacy Architecture (MALA)** framework addresses the critical challenge of integrating agentic artificial intelligence into legacy industrial environments that lack modern Application Programming Interfaces (APIs). By treating legacy software systems—including terminal interfaces, comma-separated value (CSV) archives, and scanned Portable Document Format (PDF) files—as a dynamic operational surface rather than a static data repository, MALA supports autonomous decision-making while maintaining rigorous, deterministic safety guarantees through a Constrained Markov Decision Process (CMDP) formulation.
+The **Multi-Agent Legacy Architecture (MALA)** framework addresses the problem of connecting agentic AI to legacy industrial systems that expose no modern APIs. Rather than treating legacy software---terminal interfaces, CSV archives, and scanned PDF files---as a static data store, MALA reads them as a live operational surface and supports autonomous decision-making through a Constrained Markov Decision Process (CMDP) safety filter.
 
-Empirical evaluation at a 50-year-old European steel manufacturing site demonstrated significant operational improvements: a **26.6× reduction in decision-support latency** (from 320 to 12 minutes), a **98% task success rate** across 50 disruption cycles, an **88% reduction in human correction ratio**, and **zero safety violations** under supervised replay conditions. The framework integrates Recursive Context Enrichment (RCE), CMDP-based safety filtering, confidence-gated autonomy thresholds, and Human-on-the-Loop (HotL) escalation into a single auditable workflow.
+A 50-cycle retrospective replay study at a 50-year-old European steel site produced the following results: a **26.6× reduction in decision-support latency** (from 320 to 12 minutes), a **98% task success rate**, an **88% reduction in human correction ratio**, and **zero safety violations** under supervised replay conditions. The framework combines Recursive Context Enrichment (RCE), CMDP-based safety filtering, confidence-gated autonomy thresholds, and Human-on-the-Loop (HotL) escalation in one auditable workflow.
 
 ## Citation
 
-If you use the MALA framework in your research, please cite the foundational paper:
+If you use MALA in your research, please cite the foundational paper:
 
 ```bibtex
 @article{mukherjee2026mala,
@@ -31,25 +31,25 @@ If you use the MALA framework in your research, please cite the foundational pap
 
 ## System Architecture
 
-MALA implements a three-tier architecture that isolates ingestion, cognitive planning, and human oversight, as illustrated in Figure 1 of the paper.
+MALA uses a three-tier architecture that separates ingestion, planning, and human oversight, as shown in Figure 1 of the paper.
 
 ### Tier 1: Ingestion Layer ("The Bridge")
 
-The Ingestion Layer abstracts heterogeneous legacy data sources into a unified, machine-readable knowledge set *K*. A suite of modality-specific adapters translates raw legacy outputs—terminal screen text, tabular CSV records, and scanned PDF documents—into normalized JSON-LD objects. The Recursive Context Enrichment (RCE) procedure iteratively invokes these adapters until the system's confidence score *ρ(K)* reaches the high-confidence threshold *θ_high*, or the maximum recursion depth *d_max* is exhausted.
+The Ingestion Layer reads legacy data sources of mixed types and converts them into a unified knowledge set *K*. Modality-specific adapters translate raw legacy outputs---terminal screen text, CSV records, and scanned PDF documents---into normalized JSON-LD objects. The Recursive Context Enrichment (RCE) procedure calls these adapters in a loop until the confidence score *ρ(K)* reaches the high-confidence threshold *θ_high* or the maximum recursion depth *d_max* is reached.
 
 ### Tier 2: Orchestration Layer ("The Brain")
 
-The Orchestration Layer houses the three autonomous agents that collectively constitute the MALA decision engine:
+The Orchestration Layer holds the three agents that form the MALA decision pipeline:
 
-- **Gatherer**: Issues structured tool calls to the Tier 1 adapters and assembles the enriched knowledge set *K*.
-- **Planner**: Consumes *K* and proposes a ranked set of candidate corrective actions *A*.
-- **Critic**: Evaluates each candidate action against the CMDP safety policy *π\**, applying Lagrangian safety filters. Any action violating a hard constraint (*κᵢ = 0*) receives an infinite penalty and is removed from the feasible action set.
+- **Gatherer**: Issues tool calls to the Tier 1 adapters and assembles the enriched knowledge set *K*.
+- **Planner**: Reads *K* and proposes a ranked set of candidate corrective actions *A*.
+- **Critic**: Checks each candidate action against the CMDP safety policy *π\**, applying Lagrangian safety filters. Any action that violates a hard constraint (*κᵢ = 0*) is removed from the feasible action set.
 
-The `MALACore` orchestrator coordinates these three agents in a fixed sequential pipeline, enforcing confidence-gated autonomy thresholds and managing state transitions between autonomous execution and Human-on-the-Loop escalation.
+The `MALACore` orchestrator runs these three agents in a fixed sequential pipeline, applies confidence-gated autonomy thresholds, and manages transitions between autonomous execution and Human-on-the-Loop escalation.
 
 ### Tier 3: Human Interface Layer ("The Dashboard")
 
-The Human Interface Layer implements the Human-on-the-Loop (HotL) escalation protocol. When the Critic's confidence score *ρ* falls below the low-confidence threshold *θ_low*, or when a safety constraint is violated, the system escalates to a human Judge. The Judge receives a machine-generated justification log containing the knowledge set, the proposed action, and the Critic's constraint evaluation, which supports an informed approval or override decision. All escalation events are immutably logged for post-hoc auditability.
+The Human Interface Layer runs the Human-on-the-Loop (HotL) escalation protocol. When the confidence score *ρ* falls below the low-confidence threshold *θ_low*, or when a safety constraint is violated, the system escalates to a human Judge. The Judge receives a justification log containing the knowledge set, the proposed action, and the Critic's constraint evaluation, which supports an informed approval or override decision. All escalation events are logged for later review.
 
 ## Repository Structure
 
@@ -79,7 +79,7 @@ Mala-Framework/
 
 ## Installation
 
-MALA has no external dependencies beyond the Python standard library, ensuring reproducibility in air-gapped and compute-constrained research environments.
+MALA has no external dependencies beyond the Python standard library, which keeps it reproducible in air-gapped and compute-constrained research environments.
 
 ```bash
 # Clone the repository
@@ -155,11 +155,11 @@ python tests/run_tests.py
 min_{λ≥0} max_π E_π[Σ γ^t R_t] - Σ λᵢ(E_π[Σ γ^t C_{i,t}] - κᵢ)
 ```
 
-With κᵢ = 0 (hard constraints), any action driving a variable into its violation bin acquires infinite penalty, removing it from π*.
+With κᵢ = 0 (hard constraints), any action that drives a variable into its violation bin receives an infinite penalty and is removed from π*.
 
 ### 3. Global Industrial Semantic Model (GISM)
 
-Implements ontological mapping function φ: L_local → L_standard with 420 validated concept mappings. Example mappings:
+The GISM is an ontological mapping function φ: L_local → L_standard with 420 validated concept mappings. Example mappings:
 
 | Local Term | Standard Term |
 |------------|---------------|
@@ -174,8 +174,8 @@ Coverage: 85% of observed terms (Section 5.8). Unmapped terms trigger LLM-based 
 ### 4. Contextual Data Polishing (CDP)
 
 Applies three cleaning rules (Section 4.6):
-1. **Unit normalization**: Convert metric, imperial, and local units to plant-wide standard
-2. **Temporal reconciliation**: Reconstruct true state when timestamps disagree across systems
+1. **Unit normalization**: Convert metric, imperial, and local units to a plant-wide standard
+2. **Temporal reconciliation**: Reconstruct the true state when timestamps disagree across systems
 3. **Sensitive-field stripping**: Remove personal data before optional remote model use
 
 ## Evaluation Results
@@ -190,8 +190,8 @@ From the 50-cycle retrospective replay study (Section 5):
 | Safety Violations | 2 | 14 | **0** |
 | Human Correction Ratio | 100% (50/50) | 0% (0/50) | **12% (6/50)** |
 
-**Evaluation Summary**:
-- **26.6× latency reduction** compared to manual baseline
+**Summary**:
+- **26.6× latency reduction** compared to the manual baseline
 - **88 percentage-point reduction** in human correction ratio
 - **Zero safety violations** across all 50 cycles with Critic enforcement
 - **6 Judge escalations** (12% HCR) concentrated in high-uncertainty cycles
@@ -200,17 +200,17 @@ From the 50-cycle retrospective replay study (Section 5):
 
 1. **Terminal UI Stability**: Depends on stable OCR output; UI changes require adapter retraining
 2. **GISM Coverage**: 85% coverage of observed terms; 15% trigger LLM fallback with Judge review
-3. **Recursion Depth**: d_max = 3 limits queries requiring >3 cross-system lookups
-4. **Compute Overhead**: 3-5× cost vs. single LLM call (~$0.30-$0.40 per cycle at GPT-4 pricing)
+3. **Recursion Depth**: d_max = 3 limits queries requiring more than 3 cross-system lookups
+4. **Compute Overhead**: 3--5× cost vs. a single LLM call (~$0.30--$0.40 per cycle at GPT-4 pricing)
 5. **Evaluation Mode**: Replay/shadow protocol, not autonomous live actuation
 
-## Future Work
+## Next Steps
 
 1. Test small language models (SLMs) on local factory hardware for offline reasoning
-2. Define cross-firm agent protocols preserving data sovereignty
+2. Define cross-firm agent protocols that preserve data sovereignty
 3. Build self-healing adapters that relearn UI changes after legacy software updates
-4. Extend adapter set to mount offline-archived records on demand
-5. Replicate 50-cycle study on additional disruption classes and industrial sites
+4. Extend the adapter set to mount offline-archived records on demand
+5. Replicate the 50-cycle study on additional disruption classes and industrial sites
 
 ## License
 

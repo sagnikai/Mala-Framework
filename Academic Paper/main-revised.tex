@@ -73,6 +73,7 @@
 
 \maketitle
 
+
 \begin{abstract}
 Many industrial firms run daily operations through terminals, CSV archives, scanned PDFs, and local shop-floor notes that expose no APIs. This paper presents the \textbf{\MALA{}}, a three-tier framework that treats legacy software as a live operating surface rather than a static data store. \MALA{} combines Gatherer agents for Recursive Context Enrichment (RCE), a Critic agent enforcing constrained Markov decision process (CMDP) safety limits, and a Human-on-the-Loop (HotL) Judge for exception review. The framework integrates freshness-gated evidence gathering, source-row traceability, staged autonomy thresholds, and local-network deployment controls into one auditable workflow. In a 50-cycle retrospective replay study on archived Rolling Mill B disruptions at a 50-year-old European steel site, \MALA{} reduced decision-support latency from 320 to 12~minutes (median~10, SD~4), required Judge intervention in only 6 of 50 cycles, and produced 49 successful recommendations with zero safety violations. An ablation study confirms that each component contributes independently. The evaluation uses replay/shadow protocol rather than autonomous live actuation.
 \end{abstract}
@@ -108,21 +109,22 @@ The main contributions of this work are:
 
 \subsection{Positioning Relative to Prior Work}
 
-\MALA{} does not claim to invent screen scraping, ontology mediation, CMDP safety control, or human oversight in isolation. Those building blocks are adapted from prior work~\cite{comella2000,fogliatto2020,achiam2017,yang2023,ribeiro2019}. The novelty is their integration into one grounded operating method for industrial settings that do not expose callable services. Section~\ref{sec:discussion_standard} discusses when this integration may qualify as a reusable methodological standard.
+\MALA{} does not claim to invent screen scraping, ontology mediation, CMDP safety control, or human oversight in isolation. Those building blocks are adapted from prior work~\cite{comella2000,fogliatto2020,achiam2017,yang2023,ribeiro2019}. The contribution is their integration into one grounded operating method for industrial settings that do not expose callable services. Section~\ref{sec:discussion_standard} discusses when this integration may qualify as a reusable methodological standard.
+
 
 \section{Literature Review}
 
 \subsection{From Passive RAG to Agentic AI}
 
-Recent agent systems can plan, call tools, and loop over sub-tasks rather than answer a single prompt. Acharya \emph{et al.} describe this shift through autonomy, adaptability, and self-sufficiency. They also connect agentic systems to modular and multi-agent architectures for long-horizon goal execution~\cite{acharya2025}. Most of that work assumes accessible web services and clean application state. Legacy industrial software breaks that assumption. Agents must read terminals, parse file exports, and cope with missing or stale fields, as documented in the companion case-study appendix (Appendix~\ref{app:case_study}). Barua \emph{et al.} point to predictive maintenance, real-time scheduling, computer-vision inspection, and supply-chain coordination as major industrial uses of artificial intelligence. They also note barriers such as legacy infrastructure, data silos, employee resistance, and governance concerns~\cite{barua2025}.
+Recent agent systems can plan, call tools, and loop over sub-tasks rather than answer a single prompt. Acharya \emph{et al.} describe this shift through autonomy, adaptability, and self-sufficiency. They also connect agentic systems to modular and multi-agent architectures for long-horizon goal execution~\cite{acharya2025}. Most of that work assumes accessible web services and clean application state. Legacy industrial software breaks that assumption. Agents must read terminals, parse file exports, and cope with missing or stale fields, as documented in the companion case-study appendix (Appendix~\ref{app:case_study}). Barua \emph{et al.} identify predictive maintenance, real-time scheduling, computer-vision inspection, and supply-chain coordination as major industrial uses of AI. They also note barriers such as legacy infrastructure, data silos, employee resistance, and governance concerns~\cite{barua2025}.
 
 \subsection{Legacy Interoperability and the Wrapper Problem}
 
-A full system replacement is often too risky for firms whose daily logic still lives inside 30-to-50-year-old software. A classic SEI survey of legacy modernization groups the main options into replacement, wrapping, migration, and component-based redevelopment. It also lists screen scraping, database gateways, XML integration, replication, object-oriented wrapping, and componentization as common modernization techniques~\cite{comella2000}. Integration middleware helps with fixed data transfers. It does not answer open-ended requests such as the question of which substitute batch can satisfy grade X if Rolling Mill B stops. We treat interoperability as a translation task. In \MALA{}, semantic wrapping places an LLM-guided layer over rigid schemas such as COBOL records or SQL-92 tables, consistent with the companion case-study appendix (Appendix~\ref{app:case_study}). This choice also matches later interoperability reviews in manufacturing. Fraga \emph{et al.} show that ontology-based mediation often depends on a shared vocabulary. Their review points to OWL, Prot\'eg\'e, Jena, and ISO TC 184 standards in many industrial interoperability solutions~\cite{fogliatto2020}.
+A full system replacement is often too risky for firms whose daily logic still lives inside 30-to-50-year-old software. A SEI survey of legacy modernization groups the main options into replacement, wrapping, migration, and component-based redevelopment. It also lists screen scraping, database gateways, XML integration, replication, object-oriented wrapping, and componentization as common modernization techniques~\cite{comella2000}. Integration middleware helps with fixed data transfers. It does not answer open-ended requests such as the question of which substitute batch can satisfy grade X if Rolling Mill B stops. In \MALA{}, semantic wrapping places an LLM-guided layer over rigid schemas such as COBOL records or SQL-92 tables, consistent with the companion case-study appendix (Appendix~\ref{app:case_study}). This choice also matches later interoperability reviews in manufacturing. Fraga \emph{et al.} show that ontology-based mediation often depends on a shared vocabulary. Their review identifies OWL, Prot\'eg\'e, Jena, and ISO TC 184 standards in many industrial interoperability solutions~\cite{fogliatto2020}.
 
 \subsection{Socio-Technical System Theory in CS Contexts}
 
-Prior work on resistance in long-running firms points to trust, language, and control as design requirements. Barua \emph{et al.} identify employee resistance, governance concerns, and legacy infrastructure as recurring barriers to AI adoption in industry~\cite{barua2025}. In this paper, trust means traceability. Control means the worker can inspect the source row and override the plan. Language means local shop terms must map to a standard schema before planning starts. This framing turns social friction into a system-design problem. Reviews in product lifecycle management reach a similar conclusion. Ontology-based solutions matter because they align data fields and create a shared conceptual layer across teams, software, and naming conventions~\cite{fogliatto2020}.
+Prior work on resistance in long-running firms identifies trust, language, and control as design requirements. Barua \emph{et al.} list employee resistance, governance concerns, and legacy infrastructure as recurring barriers to AI adoption in industry~\cite{barua2025}. In this paper, trust means traceability. Control means the worker can inspect the source row and override the plan. Language means local shop terms must map to a standard schema before planning starts. This framing turns social friction into a system-design problem. Reviews in product lifecycle management reach a similar conclusion. Ontology-based solutions matter because they align data fields and create a shared conceptual layer across teams, software, and naming conventions~\cite{fogliatto2020}.
 
 \subsection{Human-in-the-Loop and Human-on-the-Loop Frameworks}
 
@@ -130,9 +132,10 @@ Classical HITL places a person inside each step of the loop. That slows response
 
 \subsection{Multi-Agent Frameworks and Industrial Baselines}
 
-Several recent frameworks support multi-agent LLM workflows. AutoGen supports multi-agent conversation with tool use and human feedback loops~\cite{wu2023autogen}. MetaGPT assigns software-engineering roles to agents in a structured pipeline~\cite{hong2024metagpt}. CrewAI orchestrates role-playing autonomous agents for collaborative task execution~\cite{moura2024crewai}. Guo \emph{et al.} survey progress and open challenges in LLM-based multi-agent systems, noting gaps in grounding, safety, and domain-specific deployment~\cite{guo2024survey}. Wang \emph{et al.} provide a complementary survey emphasising planning, memory, and tool-use capabilities of autonomous agents~\cite{wang2024agents}. Xi \emph{et al.} map the design space of LLM-based agents across perception, reasoning, and action modules~\cite{xi2023agents}.
+Several recent frameworks support multi-agent LLM workflows. AutoGen supports multi-agent conversation with tool use and human feedback loops~\cite{wu2023autogen}. MetaGPT assigns software-engineering roles to agents in a structured pipeline~\cite{hong2024metagpt}. CrewAI orchestrates role-playing autonomous agents for collaborative task execution~\cite{moura2024crewai}. Guo \emph{et al.} survey progress and open challenges in LLM-based multi-agent systems, noting gaps in grounding, safety, and domain-specific deployment~\cite{guo2024survey}. Wang \emph{et al.} provide a complementary survey covering planning, memory, and tool-use capabilities of autonomous agents~\cite{wang2024agents}. Xi \emph{et al.} map the design space of LLM-based agents across perception, reasoning, and action modules~\cite{xi2023agents}.
 
 None of these frameworks address the legacy-industrial setting directly. They assume callable APIs, clean application state, and English-language interfaces. They do not provide deterministic safety filtering, freshness-gated evidence refresh, or source-row traceability for human review. \MALA{} fills this gap by combining agentic orchestration with plant-facing ingestion, CMDP-based safety veto, and Human-on-the-Loop escalation in one auditable workflow. Table~\ref{tab:framework_comparison} in Section~\ref{sec:discussion_standard} provides a detailed qualitative comparison.
+
 
 \section{The \MALA{} Framework}\label{sec:mala}
 
@@ -141,7 +144,7 @@ None of these frameworks address the legacy-industrial setting directly. They as
 \subsection{Three-Tier Design}
 
 \subsubsection{Ingestion Layer: The Bridge}
-The ingestion layer reads screens, terminal outputs, spreadsheets, PDFs, and local text files. It uses adapters for OCR, scripted navigation, and schema normalization. When an agent needs cold-rolled steel stock levels, it opens the terminal view and captures the result. It then turns that result into JSON-LD rather than waiting for an API that does not exist.
+The ingestion layer reads screens, terminal outputs, spreadsheets, PDFs, and local text files. It uses adapters for OCR, scripted navigation, and schema normalization. When an agent needs cold-rolled steel stock levels, it opens the terminal view and captures the result. It then converts that result into JSON-LD rather than waiting for an API that does not exist.
 
 \subsubsection{Orchestration Layer: The Brain}
 The orchestration layer coordinates several roles:
@@ -198,6 +201,7 @@ Figure~\ref{fig:arch} summarises how the ingestion, orchestration, and review ti
 \caption{Three-tier \MALA{} architecture linking legacy-system ingestion, supervised orchestration, and Human-on-the-Loop review. Arrows show data flow; dashed arrow indicates the audited write-back path.}\label{fig:arch}
 \end{figure}
 
+
 \subsection{Rollout Path}
 
 Legacy firms rarely move from manual work to bounded autonomy in one step. \MALA{} defines a staged path:
@@ -229,7 +233,7 @@ III & Bounded Autonomy & Exception Judge & Managed \\
 
 \subsection{Formalising the Planner: Grounded CMDP Implementation}\label{sec:cmdp}
 
-We formalise the Planner Agent's decision process as a finite-horizon Constrained Markov Decision Process (CMDP)~\cite{achiam2017,yang2023}. Critically, all components of this formulation---state variables, action set, transition kernel, reward, and cost functions---are instantiated from plant-observed variables in the Rolling Mill B disruption domain, not from abstract notation alone.
+We formalise the Planner Agent's decision process as a finite-horizon Constrained Markov Decision Process (CMDP)~\cite{achiam2017,yang2023}. All components of this formulation---state variables, action set, transition kernel, reward, and cost functions---are drawn from plant-observed variables in the Rolling Mill B disruption domain, not from abstract notation alone.
 
 \subsubsection{State Space \texorpdfstring{$\mathcal{S}$}{S}}
 Each factory state $s \in \mathcal{S}$ is a triple $(T, Y, M)$ of three discretised process variables, with bin boundaries set by plant process engineers:
@@ -271,6 +275,7 @@ subject to:
   \label{eq:cmdp_con}
 \end{equation}
 
+
 \subsubsection{Lagrangian Solution}
 Following Achiam \emph{et al.}'s Constrained Policy Optimisation~\cite{achiam2017}, we solve via Lagrangian relaxation:
 \begin{equation}
@@ -282,7 +287,7 @@ Following Achiam \emph{et al.}'s Constrained Policy Optimisation~\cite{achiam201
 At convergence, $\lambda_i$ represents the shadow cost of constraint $i$. With $\kappa_i = 0$, any action that drives a variable into its violation bin acquires a large net penalty, removing it from $\pi^*$. Following Yang \emph{et al.}'s distributional safety critic~\cite{yang2023}, cost estimates incorporate a CVaR-$\alpha$ correction at $\alpha = 0.90$ to guard against tail-risk yard-congestion scenarios.
 
 \subsubsection{Resulting Policy and Sensitivity to \texorpdfstring{$\kappa$}{kappa}}
-Table~\ref{tab:policy} reports the solved $\pi^*$ for six representative states and shows how tightening the yard constraint changes the selected action. With $\kappa_2 = 0$, any action driving $Y \to \texttt{high}$ is blocked; with $\kappa_2 = 1$ (one tolerated violation), immediate reroute becomes admissible in the medium-yard state. This policy shift is a function of the constraint, not of hard-coded logic.
+Table~\ref{tab:policy} reports the solved $\pi^*$ for six representative states and shows how tightening the yard constraint changes the selected action. With $\kappa_2 = 0$, any action driving $Y \to \texttt{high}$ is blocked; with $\kappa_2 = 1$ (one tolerated violation), immediate reroute becomes admissible in the medium-yard state. This policy shift follows from the constraint, not from hard-coded logic.
 
 \begin{table}[!t]
 \sffamily
@@ -305,7 +310,7 @@ crit & any  & any  & $a_4$: escalate Judge   & $a_4$: escalate Judge   & No \\
 }
 \end{table}
 
-The Critic implements this policy as a lookup over the solved 27-state table. It accepts a proposed plan only if the action matches $\pi^*(s)$ for the jointly observed $(T, Y, M)$ state---not a single-variable threshold check. When the CMDP-guided Critic and Planner run inside the replay protocol (Section~\ref{sec:eval}), the results reported in Table~\ref{tab:metrics} follow: 49 successful recommendations, 12-minute mean latency, zero safety violations, and Judge intervention in only 6 of 50 cycles.
+The Critic applies this policy as a lookup over the solved 27-state table. It accepts a proposed plan only if the action matches $\pi^*(s)$ for the jointly observed $(T, Y, M)$ state---not a single-variable threshold check. When the CMDP-guided Critic and Planner run inside the replay protocol (Section~\ref{sec:eval}), the results reported in Table~\ref{tab:metrics} follow: 49 successful recommendations, 12-minute mean latency, zero safety violations, and Judge intervention in only 6 of 50 cycles.
 
 \subsection{Data Staleness and Temporal TTL}
 
@@ -315,6 +320,7 @@ Legacy retrieval is often slow. Slow retrieval creates stale decisions. \MALA{} 
   \label{eq:freshness}
 \end{equation}
 where $\Delta t$ is the time (in minutes) since the record was last refreshed and $\lambda = 0.05\;\text{min}^{-1}$ is the decay rate (calibrated so that a record becomes stale at roughly $F < 0.5$, i.e.\ after $\Delta t \approx 14$~minutes). In the reported deployment the refresh threshold is set to $\Delta_t = 15$~minutes: when $F(\Delta t) < e^{-\lambda \cdot 15} \approx 0.47$, the Orchestrator issues a \emph{Refresh Event} and forces the Ingestion Layer to re-query the source before planning continues. This design keeps semantic translation and decision support tied to current evidence rather than to cached plant state. That matters most when wrappers sit on top of asynchronous or weakly integrated subsystems~\cite{comella2000,fogliatto2020}.
+
 
 \section{Methodology: Gatherer--Judge Partnership}
 
@@ -359,6 +365,7 @@ Gatherer agents assemble task-specific context. A single disruption query draws 
 
 The loop continues until $\rho(\mathcal{K}) \geq \theta_{\text{high}}$ (Eq.~\ref{eq:rho}) or the recursion depth limit $d_{\max}$ is reached. The goal is not to ``find files.'' The goal is to assemble enough checked context for one plant decision.
 
+
 \subsection{The Judge as Verification Function}\label{sec:judge}
 
 We model the human Judge as a verification function $V(\hat{y}, \mathcal{K}) \in \{0, 1\}$ that checks agent output $\hat{y}$ against the assembled knowledge set. To reduce automation bias, \MALA{} uses tiered verification rules keyed to a confidence score $\rho \in [0,1]$. We define $\rho$ as the harmonic mean of three normalised sub-scores derived from the assembled knowledge set $\mathcal{K}$:
@@ -378,7 +385,7 @@ The reported deployment uses $(\theta_{\text{low}}, \theta_{\text{high}}) = (0.4
 
 \subsection{Ontological Mapping and Linguistic Isolation}
 
-Site observations in the companion case-study appendix (Appendix~\ref{app:case_study}) show a language problem as well as a data problem. Shop-floor jargon often does not match standard industrial terms or LLM training data. \MALA{} addresses this with a Global Industrial Semantic Model (GISM). In implementation, GISM is a static JSON lookup table containing exactly 420 validated concept mappings curated by plant engineers. The mapping function $\phi: \mathcal{L}_{\text{local}} \rightarrow \mathcal{L}_{\text{standard}}$ queries this table to turn entries such as ``H-402 Var-Low'' into ``Heat \#402, Chemical Variance: Below Threshold.'' If an unmapped local term is encountered, the system falls back to a few-shot LLM prompt to infer the likely standard term and flags the inferred translation for mandatory Judge review. The Judge sees plant language and standard labels side by side. This also matches the ontology literature. Shared vocabularies and explicit concept mappings help reconcile engineering terms across systems that were never designed to work together~\cite{fogliatto2020}.
+Site observations in the companion case-study appendix (Appendix~\ref{app:case_study}) show a language problem as well as a data problem. Shop-floor jargon often does not match standard industrial terms or LLM training data. \MALA{} addresses this with a Global Industrial Semantic Model (GISM). In practice, GISM is a static JSON lookup table containing exactly 420 validated concept mappings curated by plant engineers. The mapping function $\phi: \mathcal{L}_{\text{local}} \rightarrow \mathcal{L}_{\text{standard}}$ queries this table to convert entries such as ``H-402 Var-Low'' into ``Heat \#402, Chemical Variance: Below Threshold.'' If an unmapped local term is encountered, the system falls back to a few-shot LLM prompt to infer the likely standard term and flags the inferred translation for mandatory Judge review. The Judge sees plant language and standard labels side by side. This also matches the ontology literature. Shared vocabularies and explicit concept mappings help reconcile engineering terms across systems that were never designed to work together~\cite{fogliatto2020}.
 
 \subsection{Contextual Data Polishing (CDP)}
 
@@ -400,6 +407,7 @@ Local deployment matters in plants that guard process data closely. We use four 
 \end{itemize}
 
 This setup helps with language isolation, operator error, and malicious or careless misuse.
+
 
 \subsection{Implementation}\label{sec:impl}
 
@@ -554,6 +562,7 @@ class MALACore:
         }
 \end{lstlisting}
 
+
 \section{Case Study: 50-Year-Old European Steel Site}\label{sec:casestudy}
 
 The evaluation site is a mid-sized European steel and machinery producer that has operated for more than 50 years without replacing its core systems, as described in the companion case-study appendix (Appendix~\ref{app:case_study}). Four siloed layers coexist: a 1990s ERP accessible only via terminal emulator, flat CSV quality files on Windows~XP workstations, hand-updated Excel and scanned PDF logistics records, and daily shift logs written in regional language with undocumented technical slang. Data synchronisation is entirely manual; records drift out of sync, and new hires face a steep ``hidden grammar'' barrier before they can query any system productively. The full site characterisation, barrier model, and workflow audits are documented in Appendix~\ref{app:case_study}; this section records only what is necessary to interpret the evaluation.
@@ -616,6 +625,7 @@ Figure~\ref{fig:sequence} contrasts the three decision flows. Table~\ref{tab:dee
 \caption{Sequence view of manual, fully agentic, and \MALA{} decision flows. Green = human steps, blue = agent steps, gray = legacy system. Timing annotations show mean latency per workflow.}\label{fig:sequence}
 \end{figure}
 
+
 \begin{table*}[!t]
 \sffamily
 \caption{Deep-Dive Trace for Cycle 17: Grounded \MALA{} Decision Flow}\label{tab:deepdive}
@@ -672,6 +682,7 @@ This prevents speed gains from hiding unsafe behavior. Table~\ref{tab:metrics} r
 The latency figures in Table~\ref{tab:metrics} are drawn from two different measurement sources, and this asymmetry must be stated plainly before the results are interpreted. Workflow~A latency is taken from \emph{archived decision logs}: the timestamps record when a human operator entered a disruption alert and when they logged a final decision. Workflows~B and~C latency is measured as \emph{replay wall-clock time}: the clock starts when a disruption packet is released to the adapter pipeline and stops at the first approved recommendation. The two sources are not interchangeable. Archival timestamps include coordination overhead (waiting for a colleague, phone calls, handover delays) that the replay protocol does not reproduce. This means Workflow~A latency is likely \emph{upward-biased} relative to what a highly focused human operator would achieve under controlled conditions, and conversely \MALA{}'s replay latency does not capture any overhead from live system polling under production load.
 
 We accept this asymmetry for three reasons. First, the same 50 evidence packets are used for all three workflows, so the \emph{information content} available to each workflow is matched. Second, the direction of the bias is conservative for the \MALA{} claim: if Workflow~A latency is inflated, the 26.6$\times$ improvement is an overestimate of the true speedup; even halving the manual baseline estimate still yields a latency advantage exceeding one order of magnitude. Third, the study goal is deployment readiness under supervised conditions, not a precision comparison of algorithm runtimes. Readers comparing absolute latency figures across workflows should bear this asymmetry in mind.
+
 
 \begin{table*}[!t]
 \sffamily
@@ -736,7 +747,7 @@ Latency for Workflow~A is sourced from archived decision logs. For Workflows~B a
 
 Across 50 cycles, the manual baseline succeeded in 42 cases (84\%; 95\% CI: 71.5--91.7). The fully agentic baseline succeeded in 36 cases (72\%; 95\% CI: 58.3--82.5). \MALA{} succeeded in 49 cases (98\%; 95\% CI: 89.5--99.6). The separation between \MALA{} and the fully agentic baseline is visible at the cycle level, not only in aggregated prose.
 
-The reported 28\% error rate for the fully agentic baseline is simply 14 failed cycles out of 50. In this dataset, those same 14 cycles also triggered hard-rule safety violations, which is why the error count and safety-violation count are identical. \MALA{} concentrated uncertainty into explicit review instead: 6 of 50 cycles were escalated to the Judge, while the remaining 44 cycles completed without additional human correction.
+The 28\% error rate for the fully agentic baseline is 14 failed cycles out of 50. In this dataset, those same 14 cycles also triggered hard-rule safety violations, which is why the error count and safety-violation count are identical. \MALA{} concentrated uncertainty into explicit review instead: 6 of 50 cycles were escalated to the Judge, while the remaining 44 cycles completed without additional human correction.
 
 \subsection{Threshold Sensitivity}
 
@@ -761,6 +772,7 @@ Aggressive & (0.25, 0.60) & 47/50 (94) & 2/50 (4) & 0 \\
 \end{tabular}%
 }
 \end{table}
+
 
 \subsection{Ablation Study}
 
@@ -827,14 +839,14 @@ Shift note (Mill A availability) & 1 & Local-language; GISM lookup \\
 }
 \end{table}
 
+
 \subsection{GISM Coverage and Fallback Inference}
 
-The Global Industrial Semantic Model (GISM) contains 420 validated concept mappings covering approximately 85\% of observed terms. Across the 50 primary replay cycles, 9 cycles (18\%) triggered at least one LLM-based fallback inference event for an unmapped local term. Of those 9 cycles, 5 (56\%) were subsequently escalated to the Judge, compared with 1 of the 41 cycles (2\%) that required no fallback inference ($p < 0.01$, Fisher exact test). This pattern is consistent with the expectation that schema drift raises uncertainty and increases escalation pressure. Importantly, all 9 fallback-inference events were flagged in the Justification Log; none produced a silent unsupported output. The 15\% GISM coverage gap converts into a measurable but transparent escalation signal rather than a hidden failure mode.
+The Global Industrial Semantic Model (GISM) contains 420 validated concept mappings covering approximately 85\% of observed terms. Across the 50 primary replay cycles, 9 cycles (18\%) triggered at least one LLM-based fallback inference event for an unmapped local term. Of those 9 cycles, 5 (56\%) were subsequently escalated to the Judge, compared with 1 of the 41 cycles (2\%) that required no fallback inference ($p < 0.01$, Fisher exact test). This pattern is consistent with the expectation that schema drift raises uncertainty and increases escalation pressure. All 9 fallback-inference events were flagged in the Justification Log; none produced a silent unsupported output. The 15\% GISM coverage gap converts into a measurable but transparent escalation signal rather than a hidden failure mode.
 
 \subsection{Token Usage and Cost Estimate}
 
 Each full \MALA{} cycle (RCE + Critic + Judge preparation) consumed approximately 18\,000--24\,000 tokens across all LLM calls, depending on the number of RCE iterations and whether Judge review was triggered. Using \texttt{gpt-4-turbo} pricing at the time of evaluation (\$10/1M input tokens, \$30/1M output tokens) and a 75\%/25\% input/output split, a median cycle costs approximately \$0.30--\$0.40 in LLM API fees. This is 3--5$\times$ the cost of a single-call baseline (approximately \$0.07--\$0.10), consistent with the compute-overhead figure reported in the Limitations section. Total LLM API cost across all 50 primary cycles was approximately \$15--\$20. These figures are provided as deployment signals and will vary with model choice, caching, and site-specific RCE depth requirements.
-
 
 \subsection{CLEAR Evaluation Summary}
 
@@ -905,11 +917,12 @@ where $\delta_{\text{staleness}}$ is source age in years and $\sigma_{\text{sche
 \caption{Latency distribution across 50 cycles for Manual (Workflow~A) and \MALA{} (Workflow~C). Boxes show IQR; whiskers mark P10 and P90.}\label{fig:latency_box}
 \end{figure}
 
+
 \section{Discussion}
 
 \subsection{Trust as an Engineering Variable}
 
-In this setting, trust is a system property. A reviewer needs to trace a recommendation back to a raw source row, a translated label, and a rule check. When that chain is visible, review time falls even as data volume rises. This addresses the verification paradox common in industrial AI deployments: the systems most in need of human oversight are also the most opaque.
+In this setting, trust is a system property. A reviewer needs to trace a recommendation back to a raw source row, a translated label, and a rule check. When that chain is visible, review time falls even as data volume rises. This addresses the verification problem common in industrial AI deployments: the systems most in need of human oversight are also the most opaque.
 
 \subsection{Uncertainty Communication and Review Efficiency}
 
@@ -917,18 +930,18 @@ In this setting, trust is a system property. A reviewer needs to trace a recomme
 
 \subsection{Generalisability}
 
-While the empirical evaluation is based on a single European steel site and one specific disruption class, the structural challenges of legacy systems are universal across heavy industry. The architecture of \MALA{} provides a generalisable solution for these environments. The ``bridge-brain-filter'' design does not depend on the specific physics of steelmaking; rather, it depends on the presence of siloed legacy systems, undocumented local jargon, and strict safety bounds. 
+While the empirical evaluation is based on a single European steel site and one specific disruption class, the structural challenges of legacy systems are common across heavy industry. The ``bridge-brain-filter'' design does not depend on the specific physics of steelmaking; it depends on the presence of siloed legacy systems, undocumented local jargon, and strict safety bounds.
 
-For instance, this architecture naturally extends to:
+For instance, this architecture extends naturally to:
 \begin{itemize}
-  \item \textbf{Healthcare and public records}: Hospitals frequently rely on legacy mainframe systems (e.g., COBOL-based billing or patient routing) lacking APIs. \MALA{}'s Gatherer agents can enrich context by reading terminal emulators, while its local deployment posture ensures strict compliance with patient data privacy regulations (e.g., HIPAA or GDPR) without exposing data to external LLMs.
-  \item \textbf{Aerospace and chemical manufacturing}: In safety-heavy sites, the Critic layer acts as a flexible constraint mechanism. Instead of a simple temperature check, the Critic can incorporate calls to complex physics-based simulators or digital twins to validate a proposed action. The CMDP formalisation ensures that any candidate policy remains strictly within aerodynamic or thermodynamic limits before being shown to the human Judge for final approval.
-  \item \textbf{Supply chain logistics}: Global shipping ports and rail networks often depend on archaic, file-based communication protocols like flat CSVs or AS2. RCE seamlessly integrates these static files with live terminal data, allowing real-time rerouting of cargo under constrained resource limits.
+  \item \textbf{Healthcare and public records}: Hospitals frequently rely on legacy mainframe systems (e.g., COBOL-based billing or patient routing) that expose no APIs. \MALA{}'s Gatherer agents can enrich context by reading terminal emulators, while its local deployment posture keeps patient data within the facility and supports compliance with HIPAA or GDPR without exposing records to external LLMs.
+  \item \textbf{Aerospace and chemical manufacturing}: In safety-constrained sites, the Critic layer acts as a flexible constraint mechanism. Instead of a simple temperature check, the Critic can call physics-based simulators or digital twins to validate a proposed action. The CMDP formulation ensures that any candidate policy stays within aerodynamic or thermodynamic limits before the human Judge approves it.
+  \item \textbf{Supply chain logistics}: Global shipping ports and rail networks often depend on file-based communication protocols such as flat CSVs or AS2. RCE reads these static files alongside live terminal data, supporting real-time cargo rerouting under constrained resource limits.
 \end{itemize}
 
 \subsection{Toward a Methodological Standard}\label{sec:discussion_standard}
 
-The Introduction positions \MALA{} as a candidate methodological standard. The 50-cycle replay study provides initial evidence for this claim: the integrated pipeline (RCE + Critic + Judge) consistently outperforms both the manual baseline and the fully agentic baseline across all four evaluation dimensions. The ablation study further shows that each component is structurally necessary. However, a single-site evaluation is not sufficient to declare a universal standard. Full validation requires replication across at least two additional industries (e.g., healthcare records processing, aerospace maintenance scheduling) and independent reproduction by a separate research group. We frame \MALA{} as a \emph{proposed} standard backed by initial empirical evidence, not a settled one.
+The Introduction positions \MALA{} as a candidate methodological standard. The 50-cycle replay study provides initial evidence for this claim: the integrated pipeline (RCE + Critic + Judge) consistently outperforms both the manual baseline and the fully agentic baseline across all four evaluation dimensions. The ablation study further shows that each component is structurally necessary. A single-site evaluation is not sufficient to declare a universal standard. Full validation requires replication across at least two additional industries (e.g., healthcare records processing, aerospace maintenance scheduling) and independent reproduction by a separate research group. We frame \MALA{} as a \emph{proposed} standard backed by initial empirical evidence, not a settled one.
 
 Table~\ref{tab:framework_comparison} compares \MALA{} to five recent multi-agent and RAG frameworks across six capability dimensions relevant to legacy-industrial deployment.
 
@@ -956,11 +969,12 @@ Manual Baseline & \checkmark & Ad hoc & \checkmark & Implicit & -- & Tacit \\
 
 \subsection{Scaling and the Technical Debt Ceiling}
 
-\MALA{} does not remove technical debt. It makes it workable. The system treats old software as a translation target, buys time for gradual renewal, and lowers the amount of manual copying required at each disruption event.
+\MALA{} does not remove technical debt. It makes it workable. The system treats old software as a translation target, buys time for gradual renewal, and reduces the amount of manual copying required at each disruption event.
+
 
 \section{Conclusion}
 
-This paper presents \MALA{} as a proposed methodological standard for industrial sites that cannot rely on modern integration interfaces. The design integrates recursive context enrichment, deterministic safety veto via a grounded CMDP policy, a staged rollout path, local jargon mapping through a validated 420-entry ontology, and Human-on-the-Loop review into a single auditable workflow. The novel contribution is not any one ingredient in isolation but their integration into a legacy-first pipeline with freshness-gated evidence and cycle-level evaluation. In the steel-site replay study, \MALA{} reduced decision-support latency by 26.6$\times$, cut clerical burden by 88\%, and produced 49 successful recommendations with zero safety violations across 50 disruption cycles. An ablation study confirms that both the Critic and the Judge are structurally necessary: the Critic alone eliminates safety violations but stalls 28\% of cycles; the Judge alone resolves stalls but admits unsafe plans; only the full pipeline achieves 98\% success with zero violations.
+This paper presents \MALA{} as a proposed methodological standard for industrial sites that cannot rely on modern integration interfaces. The design integrates recursive context enrichment, deterministic safety veto via a grounded CMDP policy, a staged rollout path, local jargon mapping through a validated 420-entry ontology, and Human-on-the-Loop review into a single auditable workflow. The contribution is not any one ingredient in isolation but their integration into a legacy-first pipeline with freshness-gated evidence and cycle-level evaluation. In the steel-site replay study, \MALA{} reduced decision-support latency by 26.6$\times$, cut clerical burden by 88\%, and produced 49 successful recommendations with zero safety violations across 50 disruption cycles. An ablation study confirms that both the Critic and the Judge are structurally necessary: the Critic alone eliminates safety violations but stalls 28\% of cycles; the Judge alone resolves stalls but admits unsafe plans; only the full pipeline achieves 98\% success with zero violations.
 
 The main point is practical. Firms do not need to replace every legacy system before they can use agentic AI. They need agents that read the systems they already have, expose the evidence behind each recommendation, and stop when the risk or uncertainty is too high. The present results come from replay/shadow evaluation rather than unsupervised live actuation, so the findings establish deployment readiness under supervised conditions rather than full autonomous production use.
 
@@ -999,7 +1013,7 @@ The companion case study that informs the legacy-site context, terminology, and 
 
 \section*{Data Availability and DOI}
 
-The data used in this study is based on observations, prior industry knowledge and comprehension. The archival version of this report is available at Zenodo via DOI \href{https://doi.org/10.5281/zenodo.19954858}{10.5281/zenodo.19954858}. 
+The data used in this study is based on observations, prior industry knowledge and comprehension. The archival version of this report is available at Zenodo via DOI \href{https://doi.org/10.5281/zenodo.19954858}{10.5281/zenodo.19954858}.
 
 \bibliographystyle{IEEEtran}
 \begin{thebibliography}{1}
@@ -1045,8 +1059,6 @@ Q.~Yang, T.~D. Sim\~ao, S.~H. Tindemans, and M.~T.~J. Spaan,
 ``Safety-constrained reinforcement learning with a distributional safety critic,''
 \emph{Machine Learning}, vol.~112, pp.~859--887, 2023,
 \href{https://doi.org/10.1007/s10994-022-06187-8}{doi: 10.1007/s10994-022-06187-8}.
-
-
 
 \bibitem{wu2023autogen}
 Q.~Wu, G.~Banber, B.~Raber, Y.~Li, J.~Liu, C.~Belem, R.~Gong, Y.~Song, Y.~Zhang, H.~Wang, \emph{et al.},
