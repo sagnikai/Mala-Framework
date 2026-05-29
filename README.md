@@ -4,6 +4,10 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19954858.svg)](https://doi.org/10.5281/zenodo.19954858)
 
+## Data Availability
+
+The archival version of this paper and the framework source code are deposited at Zenodo: [10.5281/zenodo.19954858](https://doi.org/10.5281/zenodo.19954858). The underlying 50-cycle Rolling Mill B disruption archive is proprietary plant data and cannot be redistributed; the replay protocol and all evaluation scripts are included in this repository.
+
 ## Overview
 
 MALA connects multi-agent AI to legacy industrial systems without requiring API modernization. It treats legacy software interfaces---terminal screens, CSV archives, and scanned PDF documents---as a queryable operational surface, supporting autonomous decision-making under formally verified safety constraints.
@@ -19,11 +23,11 @@ A 50-cycle retrospective replay study at a 50-year-old European steel site produ
 If you use MALA in your research, please cite the foundational paper:
 
 ```bibtex
-@article{mukherjee2026mala,
+@misc{mukherjee2026mala,
   title={Multi-Agent Legacy Architecture (MALA): A Framework for Multi-Agent AI Integration in Legacy Industrial Systems},
   author={Mukherjee, Sagnik},
   year={2026},
-  journal={Preprint},
+  note={Preprint, Zenodo},
   doi={10.5281/zenodo.19954858},
   url={https://doi.org/10.5281/zenodo.19954858}
 }
@@ -79,7 +83,7 @@ Mala-Framework/
 
 ## Installation
 
-MALA has no external dependencies beyond the Python standard library, which keeps it reproducible in air-gapped and compute-constrained research environments.
+MALA has no required external dependencies — the core framework runs entirely on the Python standard library, which keeps it reproducible in air-gapped and compute-constrained research environments. Optional dependencies for live LLM calls and production-grade OCR/PDF/SQL adapters are listed in `requirements.txt`.
 
 ```bash
 # Clone the repository
@@ -190,6 +194,8 @@ From the 50-cycle retrospective replay study (Section 5):
 | Safety Violations | 2 | 14 | **0** |
 | Human Correction Ratio | 100% (50/50) | 0% (0/50) | **12% (6/50)** |
 
+> **Note**: Full statistical results including 95% Wilson confidence intervals for all binary outcomes are reported in Table II of the paper (DOI: [10.5281/zenodo.19954858](https://doi.org/10.5281/zenodo.19954858)).
+
 **Summary**:
 - **26.6× latency reduction** compared to the manual baseline
 - **88 percentage-point reduction** in human correction ratio
@@ -214,7 +220,7 @@ From the 50-cycle retrospective replay study (Section 5):
 
 ## AI Use Disclosure
 
-The final draft of this paper, the repository content, and all associated scripts were produced from the my own knowledge, findings, and research. 
+The final draft of this paper, the repository content, and all associated scripts were produced from my own knowledge, findings, and research. 
 Generative AI tools (self-hosted Ollama infrastructure running open-weight models including Gemma and OSS variants) were used solely for initial brainstorming, placeholder content during early drafting stages, and minor proofreading assistance. No AI-generated text appears in the final manuscript. All intellectual contributions, analysis, and conclusions are the author's own. This disclosure is made in accordance with IEEE policy on the use of artificial intelligence in scholarly publications.
 
 ## License

@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+type: software
+title: "MALA: Multi-Agent Legacy Architecture"
+abstract: >
+  A framework for multi-agent AI integration in legacy industrial systems.
+  MALA connects agentic AI to legacy software (terminal screens, CSV archives,
+  scanned PDFs) without requiring API modernisation, using CMDP-based safety
+  filtering, Recursive Context Enrichment, and Human-on-the-Loop escalation.
+authors:
+  - family-names: Mukherjee
+    given-names: Sagnik
+    orcid: "https://orcid.org/0009-0002-4111-6299"
+version: "1.0.0"
+date-released: "2026-05-01"
+license: MIT
+repository-code: "https://github.com/sagnikai/Mala-Framework"
+doi: 10.5281/zenodo.19954858
+url: "https://doi.org/10.5281/zenodo.19954858"
+keywords:
+  - multi-agent systems
+  - legacy systems
+  - industrial AI
+  - human-on-the-loop
+  - constrained MDP
+  - recursive context enrichment
+  - legacy modernization
+preferred-citation:
+  type: report
+  title: "Multi-Agent Legacy Architecture (MALA): A Framework for Multi-Agent AI Integration in Legacy Industrial Systems"
+  authors:
+    - family-names: Mukherjee
+      given-names: Sagnik
+      orcid: "https://orcid.org/0009-0002-4111-6299"
+  year: 2026
+  notes: "Preprint, Zenodo"
+  doi: 10.5281/zenodo.19954858
+  url: "https://doi.org/10.5281/zenodo.19954858"
