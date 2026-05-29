@@ -13,6 +13,19 @@ This script demonstrates the three-stage pipeline:
     Stage 3 — CMDP Critic validation + HotL escalation
 """
 
+import sys
+import os
+import io
+
+# Ensure repository root is in sys.path so it runs seamlessly from anywhere
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# Ensure UTF-8 output on Windows consoles
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+else:
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+
 import logging
 from src.mala import (
     MALACore,

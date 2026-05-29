@@ -6,7 +6,7 @@
 
 ## Overview
 
-MALA integrates multi-agent AI into legacy industrial environments without requiring API modernization.
+MALA integrates multi-agent AI into legacy industrial environments without requiring API modernization. It achieves this by treating legacy software interfaces—terminal screens, CSV archives, and scanned PDF documents—as a queryable operational surface, enabling autonomous decision support under rigorous, formally verified safety constraints.
 
 ## Abstract
 
@@ -35,188 +35,105 @@ MALA implements a three-tier architecture that isolates ingestion, cognitive pla
 
 ### Tier 1: Ingestion Layer ("The Bridge")
 
-The Ingestion Layer functions as the primary integration interface between legacy systems and the orchestration layer. It employs heterogeneous adapters to normalize unstructured and semi-structured data into a unified JSON-LD context representation:
-
-- **OCR Terminal Adapter**: Extracts text from legacy terminal emulators via Optical Character Recognition
-- **SQL-92 Connector**: Interfaces with 1990s-era Enterprise Resource Planning (ERP) databases
-- **CSV Archive Parser**: Reads flat-file quality logs from legacy workstations
-- **PDF Document Extractor**: Processes scanned metallurgical specifications and logistics schedules
+The Ingestion Layer abstracts heterogeneous legacy data sources into a unified, machine-readable knowledge set *K*. A suite of modality-specific adapters translates raw legacy outputs—terminal screen text, tabular CSV records, and scanned PDF documents—into normalized JSON-LD objects. The Recursive Context Enrichment (RCE) procedure iteratively invokes these adapters until the system's confidence score *ρ(K)* reaches the high-confidence threshold *θ_high*, or the maximum recursion depth *d_max* is exhausted.
 
 ### Tier 2: Orchestration Layer ("The Brain")
 
-The Orchestration Layer implements a multi-agent cognitive architecture with three specialized roles:
+The Orchestration Layer houses the three autonomous agents that collectively constitute the MALA decision engine:
 
-#### Gatherer Agent: Recursive Context Enrichment (RCE)
+- **Gatherer**: Issues structured tool calls to the Tier 1 adapters and assembles the enriched knowledge set *K*.
+- **Planner**: Consumes *K* and proposes a ranked set of candidate corrective actions *A*.
+- **Critic**: Evaluates each candidate action against the CMDP safety policy *π\**, applying Lagrangian safety filters. Any action violating a hard constraint (*κᵢ = 0*) receives an infinite penalty and is removed from the feasible action set.
 
-Implements the RCE algorithm (Section 4.3) to dynamically traverse siloed legacy systems and reconstruct missing state information. The agent iterates until either:
-- The confidence score ρ(K) exceeds the high threshold θ_high (Equation 2), or
-- The recursion depth limit d_max = 3 is reached
+The `MALACore` orchestrator coordinates these three agents in a fixed sequential pipeline, enforcing confidence-gated autonomy thresholds and managing state transitions between autonomous execution and Human-on-the-Loop escalation.
 
-**Confidence Score Computation** (Equation 2):
-```
-ρ(K) = (1/3 · Σ(r_j^-1))^-1
-```
-where:
-- r₁: source-coverage ratio (fraction of required fields filled)
-- r₂: freshness score F(Δt) = exp(-λΔt) with λ = 0.05 min⁻¹ (Equation 1)
-- r₃: semantic-match score (embedding cosine similarity)
+### Tier 3: Human Interface Layer ("The Dashboard")
 
-#### Planner Agent: LLM-Based Plan Generation
-
-Synthesizes enriched context from the Gatherer into sequential operational plans. In the prototype implementation, the Planner queries the Critic for CMDP-recommended actions before proposing, implementing a "Critic-guided planning" pattern that reduces rejected proposals.
-
-#### Critic Agent: CMDP Safety Filter
-
-Operates as a deterministic safety verifier implementing the solved CMDP policy π* from Table 2 of the paper. The Critic enforces three hard constraints (κᵢ = 0):
-
-**Cost Functions** (Equations 3-5):
-- C₁(s,a): Furnace over-temperature indicator (T > 1550°C)
-- C₂(s,a): Yard congestion indicator (Y > 85%)
-- C₃(s,a): Manganese out-of-spec indicator (Mn variance > 0.08)
-
-**State Space**: 27 discrete states s = (T, Y, M) where:
-- T ∈ {safe, warn, crit}: Temperature bins (≤1545°C, 1545-1550°C, >1550°C)
-- Y ∈ {low, med, high}: Yard occupancy bins (≤78%, 78-83%, >83%)
-- M ∈ {nom, elev, over}: Manganese variance bins (≤0.04, 0.04-0.08, >0.08)
-
-**Action Set**: A = {a₁, a₂, a₃, a₄}
-- a₁: Immediate reroute
-- a₂: Hold, dispatch, then reroute
-- a₃: Hold only
-- a₄: Escalate to Judge
-
-The Critic vetoes any proposed action that does not match π*(s) for the observed state, ensuring that every executed plan satisfies all safety constraints.
-
-### Tier 3: Interface Layer ("The Human Filter")
-
-Implements the Human-on-the-Loop (HotL) paradigm with tiered verification rules keyed to confidence score ρ:
-
-- **ρ ≥ θ_high (0.80)**: Silent autonomy—system proceeds and logs action for later review
-- **θ_low (0.45) ≤ ρ < θ_high**: Explicit approval—Judge receives Justification Log and must approve
-- **ρ < θ_low**: System pause—exposes missing evidence and requests guidance
-
-The Judge verification function V(ŷ, K) receives:
-- Complete Justification Log (source rows, translations, rule checks)
-- Freshness Score for each evidence field
-- Confidence Score ρ with sub-score breakdown
-- Proposed action with CMDP state context
-- Raw knowledge set K with source provenance
+The Human Interface Layer implements the Human-on-the-Loop (HotL) escalation protocol. When the Critic's confidence score *ρ* falls below the low-confidence threshold *θ_low*, or when a safety constraint is violated, the system escalates to a human Judge. The Judge receives a machine-generated justification log containing the knowledge set, the proposed action, and the Critic's constraint evaluation, enabling an informed approval or override decision. All escalation events are immutably logged for post-hoc auditability.
 
 ## Repository Structure
 
 ```
-mala-framework/
+Mala-Framework/
+├── README.md                        # This document
+├── LICENSE                          # MIT License
+├── requirements.txt                 # Python dependencies
+├── Academic Paper/
+│   └── main-revised.tex             # LaTeX source of the foundational paper
 ├── src/
-│   └── mala/                      # Core MALA implementation
-│       ├── adapters/              # Legacy system integration adapters
-│       │   ├── base.py           # Abstract adapter interface
-│       │   ├── ocr.py            # Terminal OCR adapter
-│       │   ├── csv_adapter.py    # CSV archive parser
-│       │   ├── pdf_adapter.py    # PDF document extractor
-│       │   └── sql_adapter.py    # SQL-92 ERP connector
-│       ├── agents/                # Multi-agent orchestration
-│       │   ├── gatherer.py       # RCE implementation
-│       │   ├── planner.py        # LLM-based plan generation
-│       │   └── critic.py         # CMDP safety filter
-│       ├── models.py              # Core data structures (CMDP, constraints, scores)
-│       ├── gism.py                # Global Industrial Semantic Model (420 entries)
-│       ├── cdp.py                 # Contextual Data Polishing
-│       └── core.py                # MALACore orchestrator
-├── run_comprehensive_demo.py      # Full demonstration script
-├── run_prototype.py               # Simple prototype demonstration
-├── requirements.txt               # Python dependencies
-├── README.md                      # This file
-└── Academic Paper/
-    └── main-revised.tex           # IEEE-format source paper
+│   └── mala/
+│       ├── __init__.py              # Public API surface
+│       ├── core.py                  # MALACore orchestrator
+│       ├── models.py                # Data models (FreshnessScore, CMDPState, etc.)
+│       ├── cdp.py                   # Contextual Data Polishing module
+│       ├── gism.py                  # Global Industrial Semantic Model
+│       ├── agents/                  # Gatherer, Planner, Critic agents
+│       └── adapters/                # Legacy I/O adapters (OCR, CSV, PDF, SQL)
+├── examples/
+│   ├── run_prototype.py             # Minimal single-scenario prototype
+│   └── run_comprehensive_demo.py    # Full 50-cycle evaluation demo
+└── tests/
+    ├── test_mala.py                 # Unit test suite (equations, agents, workflows)
+    └── run_tests.py                 # Standalone test runner (no pytest required)
 ```
 
 ## Installation
 
-### Prerequisites
+MALA has no external dependencies beyond the Python standard library, ensuring reproducibility in air-gapped and compute-constrained research environments.
 
-- Python 3.8 or higher
-- pip package manager
-
-### Setup
-
-1. Clone the repository:
 ```bash
+# Clone the repository
 git clone https://github.com/sagnikai/Mala-Framework.git
 cd Mala-Framework
-```
 
-2. Install dependencies:
-```bash
+# (Optional) Install optional dependencies for enhanced adapter functionality
 pip install -r requirements.txt
 ```
 
+> **Python version**: 3.8 or higher is required.
+
 ## Usage
 
-### Comprehensive Demonstration
-
-Run the full demonstration showcasing all framework components:
-
-```bash
-python run_comprehensive_demo.py
-```
-
-This script demonstrates:
-1. **Silent Autonomy**: High-confidence execution without human intervention
-2. **Explicit Approval**: Medium-confidence escalation to Judge
-3. **Safety Violation**: Critic veto of unsafe plan (temperature > 1550°C)
-4. **System Pause**: Low-confidence pause with missing evidence exposure
-
-### Programmatic Usage
+### Minimal Example
 
 ```python
-from src.mala import (
-    MALACore, GathererAgent, PlannerAgent, CriticAgent,
-    SafetyConstraint, TerminalOCRAdapter, CSVArchiveAdapter,
-    PDFParserAdapter, SQL92Adapter
-)
+import sys
+sys.path.insert(0, "src")  # Ensure the package is on the path
 
-# 1. Define safety constraints (CMDP cost functions)
-safety_ledger = [
-    SafetyConstraint(key="temperature", max_val=1550.0, unit="C", kappa=0.0),
-    SafetyConstraint(key="yard_pct", max_val=85.0, unit="%", kappa=0.0),
-    SafetyConstraint(key="mn_variance", max_val=0.08, unit="", kappa=0.0)
-]
+from mala import MALACore
 
-# 2. Initialize legacy system adapters
-adapters = {
-    "terminal_ocr": TerminalOCRAdapter(),
-    "sql_erp": SQL92Adapter(),
-    "csv_archive": CSVArchiveAdapter(),
-    "pdf_parser": PDFParserAdapter()
-}
-
-# 3. Instantiate agents
-gatherer = GathererAgent(adapters=adapters, theta_low=0.45, theta_high=0.80)
-critic = CriticAgent(safety_ledger=safety_ledger)
-planner = PlannerAgent(critic_agent=critic)
-
-# 4. Initialize MALA orchestrator
+# 1. Instantiate the orchestrator with default thresholds
 mala = MALACore(
-    gatherer=gatherer,
-    planner=planner,
-    critic=critic,
-    theta_low=0.45,
+    theta_low=0.40,
     theta_high=0.80
 )
 
-# 5. Execute workflow
+# 2. Execute a disruption-recovery workflow
 result = mala.execute_workflow(
     task="Re-route production schedule following Rolling Mill B failure"
 )
 
-# 6. Inspect result
-print(f"Status: {result['status']}")
-print(f"Confidence ρ: {result['confidence']:.3f}")
+# 3. Inspect the result
+print(f"Status    : {result['status']}")
+print(f"Confidence: {result['confidence']:.3f}")
+
 if result['status'] == 'SUCCESS':
-    print(f"Action: {result['action']['action']}")
+    print(f"Action    : {result['action']['action']}")
 elif result['status'] == 'HOTL_TRIGGERED':
     print(f"Escalation: {result['reason']}")
-    print(f"Justification Log: {result['justification_log_formatted']}")
+    print(f"Justification Log:\n{result['justification_log_formatted']}")
+```
+
+### Running the Comprehensive Demo
+
+```bash
+python examples/run_comprehensive_demo.py
+```
+
+### Running the Unit Test Suite
+
+```bash
+python tests/run_tests.py
 ```
 
 ## Key Components

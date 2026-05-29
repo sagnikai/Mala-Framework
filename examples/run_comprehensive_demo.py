@@ -1,12 +1,18 @@
 # Comprehensive MALA demonstration - validates all four workflow modes
 # Scenarios: silent autonomy, explicit approval, safety veto, system pause
 import sys
+import os
 import io
+
+# Ensure repository root is in sys.path so it runs seamlessly from anywhere
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 # Ensure UTF-8 output on Windows consoles
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 else:
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+
 """
 Comprehensive MALA Framework Demonstration
 Implements all components from the IEEE paper (DOI: 10.5281/zenodo.19954858)
@@ -57,9 +63,9 @@ def print_result(result: dict):
 
 
 def run_scenario(scenario_name: str, description: str, 
-                simulate_unsafe: bool = False,
-                theta_low: float = 0.45,
-                theta_high: float = 0.80):
+                 simulate_unsafe: bool = False,
+                 theta_low: float = 0.45,
+                 theta_high: float = 0.80):
     """
     Run a complete MALA workflow scenario.
     
