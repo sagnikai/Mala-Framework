@@ -212,6 +212,11 @@ From the 50-cycle retrospective replay study (Section 5):
 4. Extend the adapter set to mount offline-archived records on demand
 5. Replicate the 50-cycle study on additional disruption classes and industrial sites
 
+## AI Use Disclosure
+
+The final draft of this paper, the repository content, and all associated scripts were produced from the my own knowledge, findings, and research. 
+Generative AI tools (self-hosted Ollama infrastructure running open-weight models including Gemma and OSS variants) were used solely for initial brainstorming, placeholder content during early drafting stages, and minor proofreading assistance. No AI-generated text appears in the final manuscript. All intellectual contributions, analysis, and conclusions are the author's own. This disclosure is made in accordance with IEEE policy on the use of artificial intelligence in scholarly publications.
+
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
