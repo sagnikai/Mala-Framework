@@ -130,7 +130,7 @@ Classical HITL places a person inside each step of the loop. That slows response
 
 \subsection{Multi-Agent Frameworks and Industrial Baselines}
 
-Several recent frameworks support multi-agent LLM workflows. AutoGen enables multi-agent conversation with tool use and human feedback loops~\cite{wu2023autogen}. MetaGPT assigns software-engineering roles to agents in a structured pipeline~\cite{hong2024metagpt}. CrewAI orchestrates role-playing autonomous agents for collaborative task execution~\cite{moura2024crewai}. Guo \emph{et al.} survey progress and open challenges in LLM-based multi-agent systems, noting gaps in grounding, safety, and domain-specific deployment~\cite{guo2024survey}. Wang \emph{et al.} provide a complementary survey emphasising planning, memory, and tool-use capabilities of autonomous agents~\cite{wang2024agents}. Xi \emph{et al.} map the design space of LLM-based agents across perception, reasoning, and action modules~\cite{xi2023agents}.
+Several recent frameworks support multi-agent LLM workflows. AutoGen supports multi-agent conversation with tool use and human feedback loops~\cite{wu2023autogen}. MetaGPT assigns software-engineering roles to agents in a structured pipeline~\cite{hong2024metagpt}. CrewAI orchestrates role-playing autonomous agents for collaborative task execution~\cite{moura2024crewai}. Guo \emph{et al.} survey progress and open challenges in LLM-based multi-agent systems, noting gaps in grounding, safety, and domain-specific deployment~\cite{guo2024survey}. Wang \emph{et al.} provide a complementary survey emphasising planning, memory, and tool-use capabilities of autonomous agents~\cite{wang2024agents}. Xi \emph{et al.} map the design space of LLM-based agents across perception, reasoning, and action modules~\cite{xi2023agents}.
 
 None of these frameworks address the legacy-industrial setting directly. They assume callable APIs, clean application state, and English-language interfaces. They do not provide deterministic safety filtering, freshness-gated evidence refresh, or source-row traceability for human review. \MALA{} fills this gap by combining agentic orchestration with plant-facing ingestion, CMDP-based safety veto, and Human-on-the-Loop escalation in one auditable workflow. Table~\ref{tab:framework_comparison} in Section~\ref{sec:discussion_standard} provides a detailed qualitative comparison.
 
@@ -200,7 +200,7 @@ Figure~\ref{fig:arch} summarises how the ingestion, orchestration, and review ti
 
 \subsection{Rollout Path}
 
-Legacy firms rarely move from manual work to bounded autonomy in one step. \MALA{} therefore defines a staged path:
+Legacy firms rarely move from manual work to bounded autonomy in one step. \MALA{} defines a staged path:
 \begin{itemize}
   \item \textbf{Stage 1 --- Assistive tasks}: The agent searches documents, extracts values, and assembles reports. A person edits the final output.
   \item \textbf{Stage 2 --- Process orchestration}: The agent coordinates several systems and proposes plans. A person approves the plan before execution.
@@ -247,7 +247,7 @@ The Planner selects one action per step from $\mathcal{A} = \{a_1, a_2, a_3, a_4
 $P(s' \mid s, a)$ is estimated from the 50 archived disruption cycles across all $|\mathcal{S}| \times |\mathcal{A}| = 108$ state--action pairs. For example, from state $(\texttt{safe},\texttt{med},\texttt{nom})$ under $a_1$, yard transitions to \texttt{high} with probability 0.72 and stays at \texttt{med} with 0.28, reflecting observed truck-queue dynamics. Temperature and Mn transitions are treated as conditionally independent and estimated from the same archive. Of the 108 state--action pairs, 41 received zero observations in the 50-cycle archive. These sparse entries are smoothed with a Laplace prior (add-one smoothing) so that every transition row sums to one and no state--action pair is assigned a degenerate distribution.
 
 \subsubsection{Reward and Cost Functions}
-The scalar reward $R(s, a)$ encodes operational gain: restored production flow earns $+10$, each minute of delay costs $-0.5$, and a Judge escalation costs $-2$ (expert-time overhead). Three cost functions enforce safety:
+The scalar reward $R(s, a)$ encodes operational gain: restored production flow earns $+10$, each minute of delay costs $-0.5$, and a Judge escalation costs $-2$ (operator-time overhead). Three cost functions enforce safety:
 \begin{align}
   C_1(s, a) &= \mathbf{1}[T = \texttt{crit}] \label{eq:c1}\\
             &\qquad \text{(furnace over-temperature)}\nonumber\\
@@ -331,7 +331,7 @@ These materials shape the barrier model behind \MALA{} and provide the basis for
 
 \subsection{Cycle Selection and Evaluation Mode}
 
-For evaluation, one production cycle was defined as one closed Rolling Mill B disruption episode starting at the logged fault event and ending at the approved rerouting or hold decision. To reduce selection bias, the sample used the first 50 consecutive closed episodes in the archive that met three inclusion rules: (i) the same disruption class, (ii) usable timestamps, and (iii) recoverable evidence from the ERP terminal plus at least one secondary source such as a CSV archive, scanned PDF, or local-language log. Planned shutdowns, duplicate tickets, and records missing a final decision timestamp were excluded. All 50 cycles therefore belong to one task family; the study does not mix unrelated disruption types.
+For evaluation, one production cycle was defined as one closed Rolling Mill B disruption episode starting at the logged fault event and ending at the approved rerouting or hold decision. To reduce selection bias, the sample used the first 50 consecutive closed episodes in the archive that met three inclusion rules: (i) the same disruption class, (ii) usable timestamps, and (iii) recoverable evidence from the ERP terminal plus at least one secondary source such as a CSV archive, scanned PDF, or local-language log. Planned shutdowns, duplicate tickets, and records missing a final decision timestamp were excluded. All 50 cycles belong to one task family; the study does not mix unrelated disruption types.
 
 The evaluation was a retrospective replay study with shadow execution. It was not a synthetic simulation, and it did not permit autonomous writes to the live plant. Workflow A uses the archived human decisions and their original timestamps. Workflows B and C replay the same 50 evidence packets through controlled adapters and planners, then compare each generated recommendation against the historical plant resolution and the safety ledger. This design lets the paper compare workflows under matched evidence while avoiding unverified live actuation.
 
@@ -558,7 +558,7 @@ class MALACore:
 
 The evaluation site is a mid-sized European steel and machinery producer that has operated for more than 50 years without replacing its core systems, as described in the companion case-study appendix (Appendix~\ref{app:case_study}). Four siloed layers coexist: a 1990s ERP accessible only via terminal emulator, flat CSV quality files on Windows~XP workstations, hand-updated Excel and scanned PDF logistics records, and daily shift logs written in regional language with undocumented technical slang. Data synchronisation is entirely manual; records drift out of sync, and new hires face a steep ``hidden grammar'' barrier before they can query any system productively. The full site characterisation, barrier model, and workflow audits are documented in Appendix~\ref{app:case_study}; this section records only what is necessary to interpret the evaluation.
 
-The test task was \emph{Disruption Management}: automated response to a Rolling Mill~B failure requiring simultaneous production re-routing, chemical batch adjustment, and logistics re-scheduling. Manually, this required 4--6~hours of expert data gathering. We evaluated three workflows across 50 consecutive archived disruption cycles:
+The test task was \emph{Disruption Management}: automated response to a Rolling Mill~B failure requiring simultaneous production re-routing, chemical batch adjustment, and logistics re-scheduling. Manually, this required 4--6~hours of operator data gathering. We evaluated three workflows across 50 consecutive archived disruption cycles:
 
 \begin{itemize}
   \item \textbf{Workflow A (Manual baseline)}: Operators query the ERP terminal, read PDFs, and reconcile files by hand. Latency is high; fatigue errors are common.
@@ -669,7 +669,7 @@ This prevents speed gains from hiding unsafe behavior. Table~\ref{tab:metrics} r
 
 \subsection{Measurement Limitations}\label{sec:meas_limits}
 
-The latency figures in Table~\ref{tab:metrics} are drawn from two different measurement sources, and this asymmetry must be stated plainly before the results are interpreted. Workflow~A latency is taken from \emph{archived decision logs}: the timestamps record when a human operator entered a disruption alert and when they logged a final decision. Workflows~B and~C latency is measured as \emph{replay wall-clock time}: the clock starts when a disruption packet is released to the adapter pipeline and stops at the first approved recommendation. The two sources are not interchangeable. Archival timestamps include coordination overhead (waiting for a colleague, phone calls, handover delays) that the replay protocol does not reproduce. This means Workflow~A latency is likely \emph{upward-biased} relative to what a highly focused human expert would achieve under controlled conditions, and conversely \MALA{}'s replay latency does not capture any overhead from live system polling under production load.
+The latency figures in Table~\ref{tab:metrics} are drawn from two different measurement sources, and this asymmetry must be stated plainly before the results are interpreted. Workflow~A latency is taken from \emph{archived decision logs}: the timestamps record when a human operator entered a disruption alert and when they logged a final decision. Workflows~B and~C latency is measured as \emph{replay wall-clock time}: the clock starts when a disruption packet is released to the adapter pipeline and stops at the first approved recommendation. The two sources are not interchangeable. Archival timestamps include coordination overhead (waiting for a colleague, phone calls, handover delays) that the replay protocol does not reproduce. This means Workflow~A latency is likely \emph{upward-biased} relative to what a highly focused human operator would achieve under controlled conditions, and conversely \MALA{}'s replay latency does not capture any overhead from live system polling under production load.
 
 We accept this asymmetry for three reasons. First, the same 50 evidence packets are used for all three workflows, so the \emph{information content} available to each workflow is matched. Second, the direction of the bias is conservative for the \MALA{} claim: if Workflow~A latency is inflated, the 26.6$\times$ improvement is an overestimate of the true speedup; even halving the manual baseline estimate still yields a latency advantage exceeding one order of magnitude. Third, the study goal is deployment readiness under supervised conditions, not a precision comparison of algorithm runtimes. Readers comparing absolute latency figures across workflows should bear this asymmetry in mind.
 
@@ -699,7 +699,7 @@ Fully Agentic & 36/50 (72\%) & 58.3--82.5 & 4   & 4   & 1  & 2   & 5   & 14 & 0/
 \smallskip
 
 \raggedright\footnotesize
-Latency for Workflow~A is sourced from archived decision logs. For Workflows~B and~C it is replay wall-clock time from disruption-packet release to first approved recommendation, excluding post-approval shop-floor execution. Workflow~A SD (45~min) reflects natural variability in expert availability and multi-source search time across cycles. All 14 Workflow~B failures co-occurred with hard-rule safety violations due to structural dependence: without a deterministic Critic, every failure to parse a constraint boundary also produced an unsafe plan.
+Latency for Workflow~A is sourced from archived decision logs. For Workflows~B and~C it is replay wall-clock time from disruption-packet release to first approved recommendation, excluding post-approval shop-floor execution. Workflow~A SD (45~min) reflects natural variability in operator availability and multi-source search time across cycles. All 14 Workflow~B failures co-occurred with hard-rule safety violations due to structural dependence: without a deterministic Critic, every failure to parse a constraint boundary also produced an unsafe plan.
 \end{table*}
 
 \begin{figure}[!t]
@@ -766,7 +766,7 @@ Aggressive & (0.25, 0.60) & 47/50 (94) & 2/50 (4) & 0 \\
 
 To isolate the contributions of each \MALA{} component, we performed full re-runs of the 50-cycle replay under three ablated configurations: (1) RCE only (no Critic, no Judge), (2) RCE + Critic (no Judge), and (3) Full \MALA{} (RCE + Critic + Judge). Each configuration replayed the same 50 archived disruption packets through the complete ingestion--orchestration--review pipeline with the designated component or components disabled; no projection or extrapolation was used. Table~\ref{tab:ablation} presents the results.
 
-The causal chain across the three rows is explicit. \textbf{RCE only}: without a deterministic Critic, the planner produces plans for all 50 cycles but 14 breach hard rules---fast progress, zero safety guarantee. \textbf{Critic without Judge}: adding the Critic eliminates all 14 safety violations by vetoing non-compliant plans; however, because no escalation path exists for blocked cycles, those 14 cycles simply halt, leaving success at 72\%---safety is guaranteed, but progress is blocked. \textbf{Full \MALA{} (Critic + Judge)}: adding the Judge resolves the 14 blocked cycles through human review, restoring success to 98\% while maintaining zero safety violations---safety guaranteed \emph{and} progress restored. The Critic and the Judge are therefore complementary structural necessities: each is necessary, neither is sufficient alone.
+The causal chain across the three rows is explicit. \textbf{RCE only}: without a deterministic Critic, the planner produces plans for all 50 cycles but 14 breach hard rules---fast progress, zero safety guarantee. \textbf{Critic without Judge}: adding the Critic eliminates all 14 safety violations by vetoing non-compliant plans; however, because no escalation path exists for blocked cycles, those 14 cycles simply halt, leaving success at 72\%---safety is guaranteed, but progress is blocked. \textbf{Full \MALA{} (Critic + Judge)}: adding the Judge resolves the 14 blocked cycles through human review, restoring success to 98\% while maintaining zero safety violations---safety guaranteed \emph{and} progress restored. The Critic and the Judge are complementary structural necessities: each is necessary, neither is sufficient alone.
 
 \begin{table}[!t]
 \sffamily
@@ -789,7 +789,7 @@ RCE + Critic & 36/50 (72\%) & 0 & 0/50 (0\%) \\
 
 \subsection{Human Correction Ratio and Cognitive Load}
 
-In Workflow A, the human expert performed substantive retrieval or correction work in 50 of 50 cycles. In Workflow C, Judge intervention was required in 6 of 50 cycles (12\%; 95\% CI: 5.6--23.8). This is an \textbf{88 percentage-point reduction} in repetitive clerical work and returns about 280 minutes of expert time per disruption event. A low HCR matters only because it is paired here with 49 successful cycles and zero safety violations.
+In Workflow A, the human operator performed substantive retrieval or correction work in 50 of 50 cycles. In Workflow C, Judge intervention was required in 6 of 50 cycles (12\%; 95\% CI: 5.6--23.8). This is an \textbf{88 percentage-point reduction} in repetitive clerical work and returns about 280 minutes of operator time per disruption event. A low HCR matters only because it is paired here with 49 successful cycles and zero safety violations.
 
 \subsection{Latency Reduction}
 
@@ -799,7 +799,7 @@ In Workflow A, the human expert performed substantive retrieval or correction wo
 
 \MALA{} succeeded in 49 of 50 cycles. The one failure (Cycle 34) is analysed here to characterise the failure mode. Unlike Cycle~17, which required five-source enrichment and a Critic veto but ultimately produced an approved plan, Cycle~34 collapsed earlier in the pipeline due to two compounding evidence gaps.
 
-The disruption packet for Cycle~34 referenced a Heat identifier (H-381) that did not appear in the active ERP inventory, the CSV quality log, or the scanned PDF grade sheets covered by the 420-entry GISM. RCE reached its depth limit ($d_{\max} = 3$) without resolving the heat provenance. The Gatherer therefore returned a knowledge set $\mathcal{K}$ with source-coverage ratio $r_1 = 0.41$, which drove the composite confidence score $\rho$ below $\theta_{\text{low}} = 0.45$, triggering a \emph{System Pause}. The Judge log for Cycle~34 records that H-381 had been retired from the active ERP and its records archived to an offline tape backup not accessible through the current adapter set. No substitute Heat with a matching manganese-tolerance profile was available from online sources within the decision window. The cycle was therefore logged as \emph{failed---unresolvable evidence gap} rather than as a safety violation or planner error. This failure mode is distinct from the 14 Workflow~B failures, which arose from absent safety filtering. The appropriate remediation is an adapter extension to mount archived tape records on demand, listed as a next step.
+The disruption packet for Cycle~34 referenced a Heat identifier (H-381) that did not appear in the active ERP inventory, the CSV quality log, or the scanned PDF grade sheets covered by the 420-entry GISM. RCE reached its depth limit ($d_{\max} = 3$) without resolving the heat provenance. The Gatherer therefore returned a knowledge set $\mathcal{K}$ with source-coverage ratio $r_1 = 0.41$, which drove the composite confidence score $\rho$ below $\theta_{\text{low}} = 0.45$, triggering a \emph{System Pause}. The Judge log for Cycle~34 records that H-381 had been retired from the active ERP and its records archived to an offline tape backup not accessible through the current adapter set. No substitute Heat with a matching manganese-tolerance profile was available from online sources within the decision window. The cycle was logged as \emph{failed---unresolvable evidence gap} rather than as a safety violation or planner error. This failure mode is distinct from the 14 Workflow~B failures, which arose from absent safety filtering. The appropriate remediation is an adapter extension to mount archived tape records on demand, listed as a next step.
 
 \subsection{Per-Source RCE Latency Breakdown}
 
@@ -829,7 +829,7 @@ Shift note (Mill A availability) & 1 & Local-language; GISM lookup \\
 
 \subsection{GISM Coverage and Fallback Inference}
 
-The Global Industrial Semantic Model (GISM) contains 420 validated concept mappings covering approximately 85\% of observed terms. Across the 50 primary replay cycles, 9 cycles (18\%) triggered at least one LLM-based fallback inference event for an unmapped local term. Of those 9 cycles, 5 (56\%) were subsequently escalated to the Judge, compared with 1 of the 41 cycles (2\%) that required no fallback inference ($p < 0.01$, Fisher exact test). This pattern is consistent with the expectation that schema drift raises uncertainty and increases escalation pressure. Crucially, all 9 fallback-inference events were flagged in the Justification Log; none produced a silent unsupported output. The 15\% GISM coverage gap therefore converts into a measurable but transparent escalation signal rather than a hidden failure mode.
+The Global Industrial Semantic Model (GISM) contains 420 validated concept mappings covering approximately 85\% of observed terms. Across the 50 primary replay cycles, 9 cycles (18\%) triggered at least one LLM-based fallback inference event for an unmapped local term. Of those 9 cycles, 5 (56\%) were subsequently escalated to the Judge, compared with 1 of the 41 cycles (2\%) that required no fallback inference ($p < 0.01$, Fisher exact test). This pattern is consistent with the expectation that schema drift raises uncertainty and increases escalation pressure. Importantly, all 9 fallback-inference events were flagged in the Justification Log; none produced a silent unsupported output. The 15\% GISM coverage gap converts into a measurable but transparent escalation signal rather than a hidden failure mode.
 
 \subsection{Token Usage and Cost Estimate}
 
@@ -840,7 +840,7 @@ Each full \MALA{} cycle (RCE + Critic + Judge preparation) consumed approximatel
 
 Table~\ref{tab:metrics} and the ablation study together satisfy five deployment-readiness criteria we term CLEAR (our own construct)---cost, latency, efficacy, assurance, and reliability:
 \begin{itemize}
-  \item \textbf{Cost}: about 280 expert minutes are freed per disruption event.
+  \item \textbf{Cost}: about 280 operator minutes are freed per disruption event.
   \item \textbf{Latency}: mean response time falls from 320 to 12 minutes.
   \item \textbf{Efficacy}: 49 of 50 cycles meet the success criterion.
   \item \textbf{Assurance}: the Critic-plus-Judge path records 0 safety violations in 50 replayed cycles.
@@ -923,12 +923,12 @@ For instance, this architecture naturally extends to:
 \begin{itemize}
   \item \textbf{Healthcare and public records}: Hospitals frequently rely on legacy mainframe systems (e.g., COBOL-based billing or patient routing) lacking APIs. \MALA{}'s Gatherer agents can enrich context by reading terminal emulators, while its local deployment posture ensures strict compliance with patient data privacy regulations (e.g., HIPAA or GDPR) without exposing data to external LLMs.
   \item \textbf{Aerospace and chemical manufacturing}: In safety-heavy sites, the Critic layer acts as a flexible constraint mechanism. Instead of a simple temperature check, the Critic can incorporate calls to complex physics-based simulators or digital twins to validate a proposed action. The CMDP formalisation ensures that any candidate policy remains strictly within aerodynamic or thermodynamic limits before being shown to the human Judge for final approval.
-  \item \textbf{Supply chain logistics}: Global shipping ports and rail networks often depend on archaic, file-based communication protocols like flat CSVs or AS2. RCE seamlessly integrates these static files with live terminal data, enabling real-time rerouting of cargo under constrained resource limits.
+  \item \textbf{Supply chain logistics}: Global shipping ports and rail networks often depend on archaic, file-based communication protocols like flat CSVs or AS2. RCE seamlessly integrates these static files with live terminal data, allowing real-time rerouting of cargo under constrained resource limits.
 \end{itemize}
 
 \subsection{Toward a Methodological Standard}\label{sec:discussion_standard}
 
-The Introduction positions \MALA{} as a candidate methodological standard. The 50-cycle replay study provides initial evidence for this claim: the integrated pipeline (RCE + Critic + Judge) consistently outperforms both the manual baseline and the fully agentic baseline across all four evaluation dimensions. The ablation study further shows that each component is structurally necessary. However, a single-site evaluation is not sufficient to declare a universal standard. Full validation requires replication across at least two additional industries (e.g., healthcare records processing, aerospace maintenance scheduling) and independent reproduction by a separate research group. We therefore frame \MALA{} as a \emph{proposed} standard backed by initial empirical evidence, not a settled one.
+The Introduction positions \MALA{} as a candidate methodological standard. The 50-cycle replay study provides initial evidence for this claim: the integrated pipeline (RCE + Critic + Judge) consistently outperforms both the manual baseline and the fully agentic baseline across all four evaluation dimensions. The ablation study further shows that each component is structurally necessary. However, a single-site evaluation is not sufficient to declare a universal standard. Full validation requires replication across at least two additional industries (e.g., healthcare records processing, aerospace maintenance scheduling) and independent reproduction by a separate research group. We frame \MALA{} as a \emph{proposed} standard backed by initial empirical evidence, not a settled one.
 
 Table~\ref{tab:framework_comparison} compares \MALA{} to five recent multi-agent and RAG frameworks across six capability dimensions relevant to legacy-industrial deployment.
 
@@ -954,7 +954,7 @@ Manual Baseline & \checkmark & Ad hoc & \checkmark & Implicit & -- & Tacit \\
 }
 \end{table}
 
-\subsection{Scalability and the Technical Debt Ceiling}
+\subsection{Scaling and the Technical Debt Ceiling}
 
 \MALA{} does not remove technical debt. It makes it workable. The system treats old software as a translation target, buys time for gradual renewal, and lowers the amount of manual copying required at each disruption event.
 

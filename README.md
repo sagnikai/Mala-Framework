@@ -6,11 +6,11 @@
 
 ## Overview
 
-MALA integrates multi-agent AI into legacy industrial environments without requiring API modernization. It achieves this by treating legacy software interfaces—terminal screens, CSV archives, and scanned PDF documents—as a queryable operational surface, enabling autonomous decision support under rigorous, formally verified safety constraints.
+MALA integrates multi-agent AI into legacy industrial environments without requiring API modernization. It achieves this by treating legacy software interfaces—terminal screens, CSV archives, and scanned PDF documents—as a queryable operational surface, supporting autonomous decision-making under rigorous, formally verified safety constraints.
 
 ## Abstract
 
-The **Multi-Agent Legacy Architecture (MALA)** framework addresses the critical challenge of integrating agentic artificial intelligence into legacy industrial environments that lack modern Application Programming Interfaces (APIs). By treating legacy software systems—including terminal interfaces, comma-separated value (CSV) archives, and scanned Portable Document Format (PDF) files—as a dynamic operational surface rather than a static data repository, MALA enables autonomous decision support while maintaining rigorous, deterministic safety guarantees through a Constrained Markov Decision Process (CMDP) formulation.
+The **Multi-Agent Legacy Architecture (MALA)** framework addresses the critical challenge of integrating agentic artificial intelligence into legacy industrial environments that lack modern Application Programming Interfaces (APIs). By treating legacy software systems—including terminal interfaces, comma-separated value (CSV) archives, and scanned Portable Document Format (PDF) files—as a dynamic operational surface rather than a static data repository, MALA supports autonomous decision-making while maintaining rigorous, deterministic safety guarantees through a Constrained Markov Decision Process (CMDP) formulation.
 
 Empirical evaluation at a 50-year-old European steel manufacturing site demonstrated significant operational improvements: a **26.6× reduction in decision-support latency** (from 320 to 12 minutes), a **98% task success rate** across 50 disruption cycles, an **88% reduction in human correction ratio**, and **zero safety violations** under supervised replay conditions. The framework integrates Recursive Context Enrichment (RCE), CMDP-based safety filtering, confidence-gated autonomy thresholds, and Human-on-the-Loop (HotL) escalation into a single auditable workflow.
 
@@ -49,7 +49,7 @@ The `MALACore` orchestrator coordinates these three agents in a fixed sequential
 
 ### Tier 3: Human Interface Layer ("The Dashboard")
 
-The Human Interface Layer implements the Human-on-the-Loop (HotL) escalation protocol. When the Critic's confidence score *ρ* falls below the low-confidence threshold *θ_low*, or when a safety constraint is violated, the system escalates to a human Judge. The Judge receives a machine-generated justification log containing the knowledge set, the proposed action, and the Critic's constraint evaluation, enabling an informed approval or override decision. All escalation events are immutably logged for post-hoc auditability.
+The Human Interface Layer implements the Human-on-the-Loop (HotL) escalation protocol. When the Critic's confidence score *ρ* falls below the low-confidence threshold *θ_low*, or when a safety constraint is violated, the system escalates to a human Judge. The Judge receives a machine-generated justification log containing the knowledge set, the proposed action, and the Critic's constraint evaluation, which supports an informed approval or override decision. All escalation events are immutably logged for post-hoc auditability.
 
 ## Repository Structure
 
@@ -86,7 +86,7 @@ MALA has no external dependencies beyond the Python standard library, ensuring r
 git clone https://github.com/sagnikai/Mala-Framework.git
 cd Mala-Framework
 
-# (Optional) Install optional dependencies for enhanced adapter functionality
+# (Optional) Install optional dependencies for additional adapter functionality
 pip install -r requirements.txt
 ```
 
@@ -136,7 +136,7 @@ python examples/run_comprehensive_demo.py
 python tests/run_tests.py
 ```
 
-## Key Components
+## Primary Components
 
 ### 1. Recursive Context Enrichment (RCE)
 
@@ -190,7 +190,7 @@ From the 50-cycle retrospective replay study (Section 5):
 | Safety Violations | 2 | 14 | **0** |
 | Human Correction Ratio | 100% (50/50) | 0% (0/50) | **12% (6/50)** |
 
-**Key Findings**:
+**Evaluation Summary**:
 - **26.6× latency reduction** compared to manual baseline
 - **88 percentage-point reduction** in human correction ratio
 - **Zero safety violations** across all 50 cycles with Critic enforcement
